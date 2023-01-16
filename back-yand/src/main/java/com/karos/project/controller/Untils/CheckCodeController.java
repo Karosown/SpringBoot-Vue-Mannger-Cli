@@ -10,25 +10,19 @@
 
 package com.karos.project.controller.Untils;
 
-import cn.hutool.Hutool;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.extra.mail.MailUtil;
 import com.karos.KaTool.iputils.IpUtils;
 import com.karos.project.annotation.AllLimitCheck;
 import com.karos.project.common.*;
 import com.karos.project.exception.BusinessException;
 import com.karos.project.model.dto.checkcode.CheckCodeRequest;
-import io.netty.util.internal.StringUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.apache.bcel.classfile.Code;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
-import com.karos.KaTool.CheckCode.GenerateCode;
+import com.karos.KaTool.CheckCode.GenerateCodeUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +54,7 @@ public class CheckCodeController {
         String key= DigestUtil.md5Hex(datestamp+ip);
         String code=null;
         try {
-           code = GenerateCode.outputVerifyImage(200, 100, httpServletResponse.getOutputStream(), 4);
+           code = GenerateCodeUtil.outputVerifyImage(200, 100, httpServletResponse.getOutputStream(), 4);
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"验证码生成失败");
         }
@@ -93,7 +87,7 @@ public class CheckCodeController {
         }
         hashOperations.delete("checkcode_img",key);
         hashOperations.delete("checkcode_sms",mail);
-        String code_sms = new GenerateCode(salt).touchTextCode(mail, 6);
+        String code_sms = new GenerateCodeUtil(salt).touchTextCode(mail, 6);
         hashOperations.put("checkcode_sms",mail,code_sms.toUpperCase(Locale.ROOT));
         emailUtils.setMessage(mail,"【掌印文章】信息验证服务","【掌印文章】您的验证码为"+code_sms);
         emailUtils.send();
