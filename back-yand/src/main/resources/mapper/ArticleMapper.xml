@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.karos.project.mapper.ArticleMapper">
+
+    <resultMap id="BaseResultMap" type="com.karos.project.model.entity.Article">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="userId" column="userId" jdbcType="BIGINT"/>
+            <result property="userArticleid" column="userArticleid" jdbcType="BIGINT"/>
+            <result property="articleUrl" column="articleUrl" jdbcType="VARCHAR"/>
+            <result property="isPublic" column="isPublic" jdbcType="TINYINT"/>
+            <result property="viewNum" column="viewNum" jdbcType="BIGINT"/>
+            <result property="IP" column="IP" jdbcType="VARCHAR"/>
+            <result property="thumbNum" column="thumbNum" jdbcType="BIGINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="upDateTime" column="upDateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,userId,userArticleid,
+        articleUrl,isPublic,viewNum,
+        IP,thumbNum,createTime,
+        upDateTime,isDelete
+    </sql>
+</mapper>
