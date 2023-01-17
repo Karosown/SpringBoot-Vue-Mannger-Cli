@@ -1,34 +1,52 @@
 <template>
   <div id="login" >
-    <el-form ref="loginForm"  label-width="80px" class="login-box">
+    <el-form v-model="loginForm"  label-width="80px" class="login-box">
       <h3 class="login-title">欢迎登录</h3>
       <el-form-item  label="账号" prop="username">
-        <el-input type="text" placeholder="请输入账号"/>
+        <el-input type="text" v-model="loginForm.userAccount" placeholder="请输入账号"/>
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input type="password" placeholder="请输入密码"/>
+        <el-input type="password" v-model="loginForm.userPassword" placeholder="请输入密码"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" v-on:click="onSubmit('loginForm')">登录</el-button>
+        <el-button type="primary" @click="onSubmit">登录</el-button>
       </el-form-item>
     </el-form>
-
-    <el-dialog
-        title="温馨提示"
-        :visible.sync="dialogVisible"
-        width="30%"
-        :before-close="handleClose">
-      <span style="color: #ffffff">请输入账号和密码</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button style="color: #ffffff" type="primary" @click="dialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
+import {sysLogin} from "@/config/apiconfig";
+import {loginForm} from "@/config/varConfig/userVarConfig/userVarConfig";
+
 export default {
-  name: "loginPage"
+  name: "loginPage",
+  data(){
+    return{
+      loginForm:loginForm
+    }
+  },
+  methods:{
+    onSubmit(){
+      this.axios.post(sysLogin,loginForm)
+          .then(res=>{
+            if (!res.data.code){
+              sessionStorage.setItem('loginStatus',JSON.stringify(res.data.data))
+              this.$message.success("登录成功")
+              this.$router.push({path:'/manngerCenter'})
+            }
+            else{
+              this.$message.error("登录失败！\n"+res.data.message)
+            }
+          })
+          .catch(err=>{
+            this.$message.info("服务器错误"+err.data.methods)
+          })
+    },
+    reg(){
+
+    }
+  }
 }
 </script>
 

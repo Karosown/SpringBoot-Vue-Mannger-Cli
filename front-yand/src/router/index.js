@@ -2,7 +2,8 @@ import Vue from 'vue'   //引入Vue
 import VueRouter from 'vue-router'
 import loginPage from "@/view/loginPage";
 import {protectTitle} from "@/config/apiconfig";
-import manngerCenter from "@/view/manngerCenter";  //引入vue-router
+import manngerCenter from "@/view/manngerCenter";
+import siteSettingPage from "@/view/manngger-main/siteSettingPage";  //引入vue-router
 
 Vue.use(VueRouter)  //Vue全局使用Router
 const router = new VueRouter({
@@ -29,7 +30,17 @@ const router = new VueRouter({
             meta:{
                 title:protectTitle,
                 mustLogin:true
-            }
+            },
+            children:[
+                {
+                    path:'/settingPage',
+                    component:siteSettingPage,
+                    meta:{
+                        title:'站点设置',
+                        mustLogin:true
+                    }
+                }
+            ]
         }
     ]
 });

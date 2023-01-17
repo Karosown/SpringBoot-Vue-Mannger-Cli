@@ -11,6 +11,7 @@
 package com.karos.project.controller.Untils;
 
 import cn.hutool.core.img.ImgUtil;
+import com.karos.KaTool.qiniu.impl.QiniuServiceImpl;
 import com.karos.project.annotation.AllLimitCheck;
 import com.karos.project.common.BaseResponse;
 import com.karos.KaTool.io.ImageUtils;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -29,12 +31,32 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/file")
 @AllLimitCheck(mustText = "文件上传")
 @Slf4j
 public class FileupController {
+
+    @Resource
+    QiniuServiceImpl qiniuService;
+    @PostMapping("/upload")
+    @AllLimitCheck(mustText = "文件上传")
+    public BaseResponse fileUpload(@RequestParam("file")MultipartFile file){
+        String originalFilename = file.getOriginalFilename();
+        File tempFile = null;
+        String url=null;
+        try {
+            tempFile = File.createTempFile("temp", originalFilename.substring(originalFilename.lastIndexOf('.')));
+            file.transferTo(tempFile);
+            url = qiniuService.uploadFile(tempFile, "/file", file.getName(), true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResultUtils.success( url);
+    }
+
 
 
     @PostMapping("/i2b/img")

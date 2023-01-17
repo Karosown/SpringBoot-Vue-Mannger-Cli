@@ -1,41 +1,30 @@
 <template>
-  <el-menu
-      default-active="2"
-      class="el-menu-vertical-demo"
-      router="true"
-      @open="handleOpen"
-      @close="handleClose">
-<!--    <el-submenu index="1">-->
-<!--      <template slot="title">-->
-<!--        <i class="el-icon-location"></i>-->
-<!--        <span>导航一</span>-->
-<!--      </template>-->
-<!--      <el-menu-item-group>-->
-<!--        <template slot="title">分组一</template>-->
-<!--        <el-menu-item index="1-1">选项1</el-menu-item>-->
-<!--        <el-menu-item index="1-2">选项2</el-menu-item>-->
-<!--      </el-menu-item-group>-->
-<!--      <el-menu-item-group title="分组2">-->
-<!--        <el-menu-item index="1-3">选项3</el-menu-item>-->
-<!--      </el-menu-item-group>-->
-<!--      <el-submenu index="1-4">-->
-<!--        <template slot="title">选项4</template>-->
-<!--        <el-menu-item index="1-4-1">选项1</el-menu-item>-->
-<!--      </el-submenu>-->
-<!--    </el-submenu>-->
-    <el-menu-item index="2">
-      <i class="el-icon-menu"></i>
-      <span slot="title">文章管理</span>
-    </el-menu-item>
-    <el-menu-item index="3" disabled>
-      <i class="el-icon-document"></i>
-      <span slot="title">站点设置</span>
-    </el-menu-item>
-    <el-menu-item index="4">
-      <i class="el-icon-setting"></i>
-      <span slot="title">引导页设置</span>
-    </el-menu-item>
-  </el-menu>
+    <el-menu
+        default-active="1"
+        class="el-menu-vertical-demo"
+        router="true">
+      <el-avatar id="logo" shape="squre" :size="78"></el-avatar>
+      <el-menu-item index="1">
+        <i class="el-icon-notebook-2"></i>
+        <span slot="title">文章管理</span>
+      </el-menu-item>
+      <el-menu-item index="2">
+        <i class="el-icon-user"></i>
+        <span slot="title">用户管理</span>
+      </el-menu-item>
+      <el-menu-item index="/settingPage" >
+        <i class="el-icon-set-up"></i>
+        <span slot="title">站点设置</span>
+      </el-menu-item>
+<!--      <el-menu-item index="4">-->
+<!--        <i class="el-icon-setting"></i>-->
+<!--        <span slot="title">引导页设置</span>-->
+<!--      </el-menu-item>-->
+      <el-menu-item index="/apidoc" >
+        <i class="el-icon-set-up"></i>
+        <span slot="title">前台对接API文档</span>
+      </el-menu-item>
+    </el-menu>
 </template>
 
 <script>
@@ -45,5 +34,11 @@ export default {
 </script>
 
 <style scoped>
-
+.el-menu-vertical-demo{
+  height: 100vh;
+  text-align: center;
+}
+#logo{
+  margin-top: 50px;
+}
 </style>
