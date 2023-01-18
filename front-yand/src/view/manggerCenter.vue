@@ -1,11 +1,11 @@
 <template>
-<div id="manngerCenter">
+<div id="manggerCenter">
   <el-container>
     <el-aside width="300px">
       <mangger-lefter></mangger-lefter>
     </el-aside>
     <el-main>
-      <router-view></router-view>
+      <manngger-main></manngger-main>
     </el-main>
   </el-container>
 </div>
@@ -13,14 +13,15 @@
 
 <script>
 import ManggerLefter from "@/components/manggerLefter";
+import MannggerMain from "@/components/mannggerMain";
 export default {
-  name: "manngerCenter",
-  components: {ManggerLefter}
+  name: "manggerCenter",
+  components: {MannggerMain, ManggerLefter}
 }
 </script>
 
 <style scoped>
-#manngerCenter{
+#manggerCenter{
   height: 100vh;
 }
 

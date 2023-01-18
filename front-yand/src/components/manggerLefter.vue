@@ -2,13 +2,14 @@
     <el-menu
         default-active="1"
         class="el-menu-vertical-demo"
-        router="true">
-      <el-avatar id="logo" shape="squre" :size="78"></el-avatar>
-      <el-menu-item index="1">
+        router="true"
+    >
+      <el-avatar id="logo" shape="squre" :size="78" :src="logo" style="background-color: #ffffff"></el-avatar>
+      <el-menu-item index="1"  disabled>
         <i class="el-icon-notebook-2"></i>
         <span slot="title">文章管理</span>
       </el-menu-item>
-      <el-menu-item index="2">
+      <el-menu-item index="2"  disabled>
         <i class="el-icon-user"></i>
         <span slot="title">用户管理</span>
       </el-menu-item>
@@ -28,8 +29,24 @@
 </template>
 
 <script>
+
+import {getAttributeByCommon} from "@/config/ApiConfig/commonApiConfig/commonApiConfig";
+
 export default {
-  name: "manggerLefter"
+  name: "manggerLefter",
+  data(){
+    return{
+      logo:null
+    }
+  },
+  mounted() {
+    this.axios.get(getAttributeByCommon+'siteLogo')
+        .then(res=>{
+          if (!res.data.code){
+            this.logo=res.data.data
+          }
+        })
+  }
 }
 </script>
 

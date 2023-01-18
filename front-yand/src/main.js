@@ -8,11 +8,13 @@ Vue.use(ElementUI);
 import axios from 'axios';
 import {baseAPI, protectTitle, sysGetlogin} from "@/config/apiconfig";
 import router from "@/router";
+import {globalValue} from "@/config/varconfig";
 // 挂载到vue原型链上
 axios.defaults.baseURL=baseAPI;
 axios.defaults.crossDomain = true;
 axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
 Vue.prototype.axios=axios;
+Vue.prototype.globalValue=globalValue;
 Vue.config.productionTip = false;
 
 Vue.prototype.resetSetItem = function (key, newVal) {
@@ -33,13 +35,12 @@ Vue.prototype.resetSetItem = function (key, newVal) {
 }
 
 
-
 router.beforeEach((to,from,next)=>{
   if (to.meta.title) document.title=to.meta.title
   else document.title=protectTitle;
   if (to.path=='/login'){
     if (sessionStorage.getItem('loginStatus')==null)  next();
-    else next('/manngercenter')
+    else next('/manggerCenter')
   }
   else{
     if(to.meta.mustLogin==true){

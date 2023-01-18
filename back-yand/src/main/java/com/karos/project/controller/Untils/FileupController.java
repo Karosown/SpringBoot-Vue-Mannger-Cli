@@ -50,7 +50,7 @@ public class FileupController {
         try {
             tempFile = File.createTempFile("temp", originalFilename.substring(originalFilename.lastIndexOf('.')));
             file.transferTo(tempFile);
-            url = qiniuService.uploadFile(tempFile, "/file", file.getName(), true);
+            url = qiniuService.uploadFile(tempFile, "/file", file.getOriginalFilename(), true);
         } catch (Exception e) {
             e.printStackTrace();
         }

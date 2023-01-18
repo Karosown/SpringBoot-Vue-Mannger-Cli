@@ -1,9 +1,10 @@
 import Vue from 'vue'   //引入Vue
 import VueRouter from 'vue-router'
 import loginPage from "@/view/loginPage";
-import {protectTitle} from "@/config/apiconfig";
-import manngerCenter from "@/view/manngerCenter";
-import siteSettingPage from "@/view/manngger-main/siteSettingPage";  //引入vue-router
+import manggerCenter from "@/view/manggerCenter";
+import siteSettingPage from "@/view/manngger-main/siteSettingPage";
+import {globalValue} from "@/config/varconfig";
+import apiDoc from "@/view/manngger-main/apiDoc";  //引入vue-router
 
 Vue.use(VueRouter)  //Vue全局使用Router
 const router = new VueRouter({
@@ -11,9 +12,9 @@ const router = new VueRouter({
     routes: [              //配置路由，这里是个数组
         {   //配置默认路由
             path:'/',
-            component: manngerCenter,
+            component: manggerCenter,
             meta:{
-                title:protectTitle,
+                title:globalValue.protectTitle()+globalValue.protectTitle,
                 mustLogin:true
             }
         },
@@ -21,14 +22,14 @@ const router = new VueRouter({
             path:'/login',
             component:loginPage,
             meta:{
-                title:protectTitle+'用户登录'
+                title:globalValue.protectTitle()+globalValue.protectTitle+'用户登录'
             }
         },
         {
-            path:'/manngerCenter',
-            component: manngerCenter,
+            path:'/manggerCenter',
+            component: manggerCenter,
             meta:{
-                title:protectTitle,
+                title:globalValue.protectTitle,
                 mustLogin:true
             },
             children:[
@@ -36,12 +37,19 @@ const router = new VueRouter({
                     path:'/settingPage',
                     component:siteSettingPage,
                     meta:{
-                        title:'站点设置',
+                        title:globalValue.protectTitle()+'站点设置',
                         mustLogin:true
                     }
-                }
+                },
+                {
+                    path:'/apidoc',
+                    component:apiDoc,
+                    meta:{
+                        title:globalValue.protectTitle()+'API文档'
+                    }
+                },
             ]
-        }
+        },
     ]
 });
 export default router;
