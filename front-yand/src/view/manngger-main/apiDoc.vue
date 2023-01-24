@@ -1,5 +1,5 @@
 <template>
-<div>
+<div >
   <el-radio v-model="open" :label='0'>彩色版</el-radio>
   <el-radio v-model="open" :label='1'>简洁版</el-radio>
   <div :key="new Date().getTime()">

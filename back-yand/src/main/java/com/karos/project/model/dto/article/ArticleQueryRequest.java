@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 查询请求
@@ -28,6 +29,8 @@ public class ArticleQueryRequest extends PageRequest implements Serializable {
      * 文章标题
      */
     private String articleTitle;
+    private List<String> label;
+
     /**
      * 类型
      */

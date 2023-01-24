@@ -1,13 +1,17 @@
 <template>
     <el-menu
-        default-active="1"
+        default-active="/articlePage"
         class="el-menu-vertical-demo"
         router="true"
     >
       <el-avatar id="logo" shape="squre" :size="78" :src="logo" style="background-color: #ffffff"></el-avatar>
-      <el-menu-item index="1"  disabled>
+      <el-menu-item index="/articlePage">
         <i class="el-icon-notebook-2"></i>
         <span slot="title">文章管理</span>
+      </el-menu-item>
+      <el-menu-item index="/class"  disabled>
+        <i class="el-icon-chat-square"></i>
+        <span slot="title">分类管理</span>
       </el-menu-item>
       <el-menu-item index="2"  disabled>
         <i class="el-icon-user"></i>

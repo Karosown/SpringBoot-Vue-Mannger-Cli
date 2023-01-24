@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 文章表
@@ -42,6 +43,8 @@ public class ArticleVo implements Serializable {
      */
     private String articleIntroduction;
     private String type;
+    private List<String> label;
+
     /**
      * 是否公开（0为否，1为公开）
      */

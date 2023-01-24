@@ -7,8 +7,7 @@ export const baseAPI=process.env.NODE_ENV ==='production'?api_run:api_dev;
 
 
 
-
-
+const getValueofAttribute="/common/get?attribute="
 //用户登录api
 const sysLogin="/user/login";
 //获取当前登录用户 get
@@ -17,7 +16,7 @@ const sysGetlogin="/user/get/login";
 const sysLogout="/user/logout";
 export {
 
-
+        getValueofAttribute,
         sysLogin,
 
 

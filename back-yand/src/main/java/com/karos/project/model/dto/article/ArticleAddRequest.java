@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 创建请求
@@ -34,6 +35,7 @@ public class ArticleAddRequest implements Serializable {
      * 类型
      */
     private int type;
+    private List<String> label;
 
     /**
      * 是否公开（0为否，1为公开）

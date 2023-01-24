@@ -1,6 +1,6 @@
 create table mannger.article
 (
-    id            varchar(256)                       not null comment 'id'
+    id            varchar(58)                       not null comment 'id'
         primary key,
     userId        bigint                             not null comment '所属用户ID',
     userArticleid bigint   default 0                 not null comment '用户文章ID',
@@ -44,7 +44,7 @@ create table mannger.common
 (
     attribute   varchar(256)                         not null comment '属性'
         primary key,
-    value       varchar(512)                         null comment '值',
+    value       varchar(256)                         null comment '值',
     comment     varchar(256)                         null,
     type        tinyint(1) default 0                 not null comment '''0 文本型 1 文件上传型',
     createdTime datetime   default CURRENT_TIMESTAMP null comment '创建或更新事件',
@@ -71,11 +71,11 @@ create table mannger.user
         primary key,
     userName     varchar(256)                           null comment '用户昵称',
     userAccount  varchar(256)                           not null comment '账号',
-    userAvatar   varchar(1024)                          null comment '用户头像',
+    userAvatar   varchar(256)                          null comment '用户头像',
     userMail     varchar(256)                           null comment '用户邮箱',
     gender       tinyint                                null comment '性别',
     userRole     varchar(256) default 'user'            not null comment '用户角色：user / admin',
-    userPassword varchar(512)                           not null comment '密码',
+    userPassword varchar(256)                           not null comment '密码',
     updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     isDelete     tinyint      default 0                 not null comment '是否删除',

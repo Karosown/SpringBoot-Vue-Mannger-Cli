@@ -12,15 +12,19 @@
         <el-button type="primary" @click="onSubmit">登录</el-button>
       </el-form-item>
     </el-form>
+    <globel-footer></globel-footer>
   </div>
 </template>
 
 <script>
 import {sysLogin} from "@/config/apiconfig";
 import {loginForm} from "@/config/varConfig/userVarConfig/userVarConfig";
+import GlobelFooter from "@/components/globelFooter";
+
 
 export default {
   name: "loginPage",
+  components: {GlobelFooter},
   data(){
     return{
       loginForm:loginForm

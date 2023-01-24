@@ -4,7 +4,9 @@ import loginPage from "@/view/loginPage";
 import manggerCenter from "@/view/manggerCenter";
 import siteSettingPage from "@/view/manngger-main/siteSettingPage";
 import {globalValue} from "@/config/varconfig";
-import apiDoc from "@/view/manngger-main/apiDoc";  //引入vue-router
+import apiDoc from "@/view/manngger-main/apiDoc";
+import classPage from "@/view/manngger-main/classPage";
+import articlePage from "@/view/manngger-main/articlePage";  //引入vue-router
 
 Vue.use(VueRouter)  //Vue全局使用Router
 const router = new VueRouter({
@@ -45,7 +47,24 @@ const router = new VueRouter({
                     path:'/apidoc',
                     component:apiDoc,
                     meta:{
-                        title:globalValue.protectTitle()+'API文档'
+                        title:globalValue.protectTitle()+'API文档',
+                        mustLogin:true
+                    }
+                },
+                {
+                  path:'/classPage',
+                  component:classPage,
+                  meta:{
+                      title:globalValue.protectTitle()+'分类管理',
+                      mustLogin:true
+                  }
+                },
+                {
+                    path:'/articlePage',
+                    component:articlePage,
+                    meta:{
+                        title:globalValue.protectTitle()+'文章管理',
+                        mustLogin:true
                     }
                 },
             ]

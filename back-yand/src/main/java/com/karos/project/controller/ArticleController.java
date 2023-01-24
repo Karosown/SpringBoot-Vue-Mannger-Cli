@@ -275,14 +275,16 @@ public class ArticleController {
      */
     @AuthCheck(mustRole = "admin")
     @GetMapping("/list")
-    public BaseResponse<List<Article>> listArticle(ArticleQueryRequest articleQueryRequest) {
+    public BaseResponse<Page<Article>> listArticle(ArticleQueryRequest articleQueryRequest) {
         Article articleQuery = new Article();
         if (articleQueryRequest != null) {
             BeanUtils.copyProperties(articleQueryRequest, articleQuery);
         }
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>(articleQuery);
         List<Article> articleList = articleService.list(queryWrapper);
-        return ResultUtils.success(articleList);
+        Page<Article> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize(),articleList.size());
+        articlePage.setRecords(articleList);
+        return ResultUtils.success(articlePage);
     }
 
     @AuthCheck
