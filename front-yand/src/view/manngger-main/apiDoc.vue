@@ -3,9 +3,9 @@
   <el-radio v-model="open" :label='0'>彩色版</el-radio>
   <el-radio v-model="open" :label='1'>简洁版</el-radio>
   <div :key="new Date().getTime()">
-    <iframe src="/static/doc/apidocstyle.html" v-if="!open">
+    <iframe src="/doc/Apidocstyle.html" v-if="!open">
     </iframe>
-    <iframe src="/static/doc/apidocmarkdown.html" v-else>
+    <iframe src="/doc/Apidocmarkdown.html" v-else>
     </iframe>
   </div>
 </div>
