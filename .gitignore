@@ -2,3 +2,4 @@
 /front-yand/node_modules/
 /front-yand/.idea/
 /back-yand/src/main/resources/application-prod.yml
+/front-yand/dist/
