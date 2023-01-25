@@ -35,7 +35,7 @@ public class ArticleAddRequest implements Serializable {
      * 类型
      */
     private int type;
-    private List<String> label;
+    private List<String> labelList;
 
     /**
      * 是否公开（0为否，1为公开）

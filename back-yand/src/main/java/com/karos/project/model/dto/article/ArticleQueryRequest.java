@@ -29,7 +29,7 @@ public class ArticleQueryRequest extends PageRequest implements Serializable {
      * 文章标题
      */
     private String articleTitle;
-    private List<String> label;
+    private List<String> labelList;
 
     /**
      * 类型

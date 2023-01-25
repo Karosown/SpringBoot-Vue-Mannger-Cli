@@ -43,7 +43,7 @@ public class ArticleVo implements Serializable {
      */
     private String articleIntroduction;
     private String type;
-    private List<String> label;
+    private List<String> labelList;
 
     /**
      * 是否公开（0为否，1为公开）

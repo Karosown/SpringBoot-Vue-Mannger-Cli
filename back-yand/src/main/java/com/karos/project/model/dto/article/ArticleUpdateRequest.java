@@ -42,7 +42,7 @@ public class ArticleUpdateRequest implements Serializable {
     private Integer isPublic;
     private int type;
 
-    private List<String> label;
+    private List<String> labelList;
 
     private static final long serialVersionUID = 1L;
 }

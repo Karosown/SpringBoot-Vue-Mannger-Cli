@@ -6,7 +6,8 @@ import siteSettingPage from "@/view/manngger-main/siteSettingPage";
 import {globalValue} from "@/config/varconfig";
 import apiDoc from "@/view/manngger-main/apiDoc";
 import classPage from "@/view/manngger-main/classPage";
-import articlePage from "@/view/manngger-main/articlePage";  //引入vue-router
+import articlePage from "@/view/manngger-main/articlePage";
+import ariticlePublishPage from "@/view/article-main/ariticlePublishPage";  //引入vue-router
 
 Vue.use(VueRouter)  //Vue全局使用Router
 const router = new VueRouter({
@@ -66,6 +67,10 @@ const router = new VueRouter({
                         title:globalValue.protectTitle()+'文章管理',
                         mustLogin:true
                     }
+                },
+                {
+                    path:'/articlePublish',
+                    component:ariticlePublishPage
                 },
             ]
         },
