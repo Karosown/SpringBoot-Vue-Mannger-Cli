@@ -18,6 +18,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.karos.KaTool.iputils.IpUtils;
 import com.karos.KaTool.lock.LockUtil;
 import com.karos.KaTool.qiniu.impl.QiniuServiceImpl;
@@ -42,6 +43,7 @@ import com.karos.project.service.ArticleService;
 import com.karos.project.service.ArticlehistoryService;
 import com.karos.project.service.ArticlethumbrecordsService;
 import com.karos.project.service.UserService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -81,6 +83,8 @@ public class ArticleController {
         return ResultUtils.success("上锁成功，请在20s内进行测试操作");
     }
     @PostMapping("/thumb")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "文章点赞接口")
     public BaseResponse<Boolean> thumbArticle(@RequestBody ArticleDoThumbRequest articleDoThumbRequest, HttpServletRequest request){
         Articlethumbrecords articlethumbrecords = new Articlethumbrecords();
         articlethumbrecords.setArticleId(articleDoThumbRequest.getArticleId());
@@ -107,6 +111,8 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/add")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "新增文章接口")
     public BaseResponse<String> addArticle(@RequestBody ArticleAddRequest articleAddRequest, HttpServletRequest request) {
         if (articleAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -169,6 +175,8 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/delete")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "删除文章接口")
     public BaseResponse<Boolean> deleteArticle(@RequestBody DeleteRequest<String> deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || StringUtils.isAnyBlank(deleteRequest.getId())) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -197,6 +205,8 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/update")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "文章更新")
     public BaseResponse<Boolean> updateArticle(@RequestBody ArticleUpdateRequest articleUpdateRequest,
                                             HttpServletRequest request) {
         if (articleUpdateRequest == null || articleUpdateRequest.getId() == null) {
@@ -257,6 +267,8 @@ public class ArticleController {
      * @return
      */
     @GetMapping("/get")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "通过文章ID获得文章")
     public BaseResponse<ArticleVo> getArticleById(String id) {
         if (StringUtils.isAnyBlank(id)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -275,6 +287,8 @@ public class ArticleController {
      */
     @AuthCheck(mustRole = "admin")
     @GetMapping("/list")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "分页获取文章列表 - 管理员")
     public BaseResponse<Page<Article>> listArticle(ArticleQueryRequest articleQueryRequest) {
         Article articleQuery = new Article();
         if (articleQueryRequest != null) {
@@ -289,6 +303,8 @@ public class ArticleController {
 
     @AuthCheck
     @GetMapping("/list/myfavorite")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "获取用户 点赞/收藏 文章")
     public BaseResponse<Page<ArticleVo>> listArticleByFavorite(HttpServletRequest request){
         User loginUser = userService.getLoginUser(request);
 
@@ -348,6 +364,8 @@ public class ArticleController {
      */
     @AuthCheck
     @GetMapping("/list/page")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "分页获取文章列表")
     public BaseResponse<Page<ArticleVo>> listArticleByPage(ArticleQueryRequest articleQueryRequest, HttpServletRequest request) {
         if (articleQueryRequest == null||(ObjectUtil.isNull(articleQueryRequest.getUserId())&&StringUtils.isAnyBlank(articleQueryRequest.getArticleTitle()))) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

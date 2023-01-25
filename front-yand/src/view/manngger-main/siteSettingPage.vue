@@ -1,0 +1,157 @@
+<template>
+ <div id="siteSettingPage">
+  <el-row style="margin-bottom: 25px">
+    <b>
+     <el-col span="2" style="margin-left: 40px">属性名</el-col>
+     <el-col span="9">属性值</el-col>
+     <el-col span="2">注释</el-col>
+    </b>
+  </el-row>
+   <el-form ref="form" :model="form" label-width="100px">
+     <div  v-for="(item,index) in form.commonList" :key="index">
+     <el-form-item :label="item.attribute">
+      <el-col>
+        <input type="file" v-if="item.type" @change="submit($event,item)"  name="file"/>
+      </el-col>
+      <el-col span="10">
+        <el-input v-model="item.value"></el-input>
+      </el-col>
+         <span style="margin-left:20px;color: #989aa2">{{item.comment}}</span>
+     </el-form-item>
+     </div>
+     <el-form-item>
+       <el-button type="primary" @click="save" :disabled="disabled">保存</el-button>
+       <el-button type="primary" @click="addbox=true">新增一项</el-button>
+     </el-form-item>
+   </el-form>
+   <el-dialog
+       title="新增配置"
+       :visible.sync="addbox"
+       width="30%"
+       center>
+     <el-form v-model="newCommon">
+       <el-form-item label="属性名">
+         <el-input v-model="newCommon.attribute"></el-input>
+       </el-form-item>
+       <el-form-item label="属性值">
+         <el-input v-model="newCommon.value"></el-input>
+       </el-form-item>
+       <el-form-item label="属性备注">
+         <el-input v-model="newCommon.comment"></el-input>
+       </el-form-item>
+       <el-form-item label="属性类型">
+         <el-select v-model="newCommon.type" placeholder="请选择">
+           <el-option
+              label="文本型" :value=0>
+           </el-option>
+           <el-option
+               label="文件型" :value=1>
+           </el-option>
+         </el-select>
+       </el-form-item>
+     </el-form>
+     <span slot="footer" class="dialog-footer">
+    <el-button @click="addbox = false">取 消</el-button>
+    <el-button type="primary" @click="add">确 定</el-button>
+  </span>
+   </el-dialog>
+
+ </div>
+</template>
+
+<script>
+
+
+import {getCommonList, saveCommon} from "@/config/ApiConfig/commonApiConfig/commonApiConfig";
+import {siteNavUpload} from "@/config/ApiConfig/fileApiConfig/fileApiConfig";
+
+export default {
+  name: "siteSettingPage",
+  data(){
+    return{
+      form:{
+        commonList:[]
+      },
+      disabled:false,
+      newCommon:{
+        attribute:null,
+        value:null,
+        comment:null,
+        type:null,
+      },
+      addbox:false
+    }
+  },
+  methods:{
+    submit($event,item){
+      var file=$event.target.files[0]
+      if (file.size>1024*1024*320){
+        this.$message.error("文件上传最多为320MB")
+      }
+      var data =new FormData();
+        var suffname=file.name.toString();
+        suffname=suffname.substring(suffname.lastIndexOf('.'));
+        data.append('file',file,'sitePage'+item.attribute+suffname);
+      this.$message.info(item.attribute+"正在上传，请稍后")
+      this.axios.post(siteNavUpload,data)
+            .then(res=>{
+                if (!res.data.code){
+                  item.value=res.data.data
+                  this.$message.success(item.attribute+"上传成功！")
+                }
+            })
+    },
+    add(){
+      this.form.commonList.push({
+        attribute:this.newCommon.attribute,
+        value:this.newCommon.value,
+        comment:this.newCommon.comment,
+        type:this.newCommon.type
+      })
+      this.addbox=false
+    },
+    save(){
+      this.axios.post(saveCommon,this.form)
+          .then(res=>{
+            if (!res.data.code){
+              this.$message.success(res.data.message)
+            }
+            else{
+              this.$message(
+                  {
+                    message:("错误码:"+res.data.code+"\n服务器错误！\n错误信息："+res.data.message),
+                    dangerouslyUseHTMLString:true,
+                    type:"error"
+                  }
+              )
+            }
+          })
+    }
+  },
+  mounted() {
+    //   this.axios.get(getValueListByCommon)
+    //       .then(res=>{
+    //         this.form.values=res.data.data;
+    //       })
+    // this.axios.get(getAttributeListByCommon)
+    //     .then(res=>{
+    //       this.form.attributes=res.data.data;
+    //     })
+    this.axios.get(getCommonList)
+        .then(res=>{
+          if (!res.data.code){
+            this.form.commonList=res.data.data
+          }
+          else{
+            this.$message.error("错误码:"+res.data.code+"\n服务器错误！\n错误信息："+res.data.message)
+          }
+        })
+  }
+}
+</script>
+
+<style scoped>
+#siteSettingPage{
+  margin-top: 100px;
+}
+</style>

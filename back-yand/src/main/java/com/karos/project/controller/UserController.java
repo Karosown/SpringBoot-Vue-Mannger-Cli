@@ -9,6 +9,7 @@ import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.karos.KaTool.io.ImageUtils;
 import com.karos.project.annotation.AllLimitCheck;
 import com.karos.project.common.BaseResponse;
@@ -24,6 +25,7 @@ import com.karos.project.service.UserService;
 import com.karos.KaTool.qiniu.impl.QiniuServiceImpl;
 import com.qiniu.util.Json;
 import com.qiniu.util.StringMap;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -69,6 +71,8 @@ public class UserController {
      * @return
      */
     @GetMapping("/get/userName")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "获取用户昵称")
     public BaseResponse<String> getUserName(@RequestParam(value = "useraccount",required = false) String userAccount,
                                             @RequestParam(value = "id",required = false) Long id,
                                             HttpServletResponse httpServletResponse){
@@ -95,6 +99,8 @@ public class UserController {
      * @return
      */
     @GetMapping("/get/userAvatar")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "获取用户头像")
     public BaseResponse<String> getUserAvatar(@RequestParam(value = "useraccount",required = false) String userAccount,
                                               @RequestParam(value = "id",required = false)Long id, HttpServletResponse httpServletResponse){
         if (StringUtils.isAnyBlank(userAccount)&& ObjectUtils.anyNull(id)){
@@ -126,6 +132,8 @@ public class UserController {
      */
     @PostMapping("/register")
     @AllLimitCheck(mustText = "用户注册")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "用户注册")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         if (userRegisterRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -154,6 +162,8 @@ public class UserController {
      * @return
      */
     @PostMapping("/login")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "用户登录")
     public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -173,6 +183,8 @@ public class UserController {
      * @param request
      * @return
      */
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "用户登出")
     @PostMapping("/logout")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
         if (request == null) {
@@ -188,6 +200,8 @@ public class UserController {
      * @param request
      * @return
      */
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "获取登录用户")
     @GetMapping("/get/login")
     public BaseResponse<UserVO> getLoginUser(HttpServletRequest request) {
         User user = userService.getLoginUser(request);
@@ -199,7 +213,8 @@ public class UserController {
     // endregion
 
     // region 增删改查
-
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "用户添加")
     /**
      * 创建用户
      *
@@ -228,6 +243,8 @@ public class UserController {
      * @param request
      * @return
      */
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "删除用户")
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest<Long> deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
@@ -246,6 +263,8 @@ public class UserController {
      */
     @PostMapping("/update")
     @AllLimitCheck(mustText = "用户信息更新")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "用户信息修改")
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -283,6 +302,8 @@ public class UserController {
     }
     @PostMapping("/update/resetpassword")
     @AllLimitCheck(mustText = "用户密码更新")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "用户密码修改")
     public BaseResponse<Boolean> updateUserPassword(@RequestBody UserUpdatePasswordRequest userUpdatePasswordRequest, HttpServletRequest request) {
         if (userUpdatePasswordRequest == null || userUpdatePasswordRequest.getId() == null||StringUtils.isAnyBlank(
                 userUpdatePasswordRequest.getUserPassword(),
@@ -315,6 +336,8 @@ public class UserController {
 
     @PostMapping("/update/resetmail")
     @AllLimitCheck(mustText = "用户邮箱更新")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "用户邮箱修改")
     public BaseResponse<Boolean> updateUserMail(@RequestBody UserUpdateMailRequest userUpdateMailRequest, HttpServletRequest request) {
         if (userUpdateMailRequest == null || userUpdateMailRequest.getId() == null||
                 StringUtils.isAnyBlank(userUpdateMailRequest.getCheckCode(),userUpdateMailRequest.getUserMail(),
@@ -345,6 +368,8 @@ public class UserController {
      * @return
      */
     @GetMapping("/get")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "根据ID获取用户")
     public BaseResponse<UserVO> getUserById(int id, HttpServletRequest request) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -363,6 +388,8 @@ public class UserController {
      * @return
      */
     @GetMapping("/list")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "获取所以用户列表")
     public BaseResponse<List<UserVO>> listUser(UserQueryRequest userQueryRequest, HttpServletRequest request) {
         User userQuery = new User();
         if (userQueryRequest != null) {
@@ -386,6 +413,8 @@ public class UserController {
      * @return
      */
     @GetMapping("/list/page")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "分页获取用户列表")
     public BaseResponse<Page<UserVO>> listUserByPage(UserQueryRequest userQueryRequest, HttpServletRequest request) {
         long current = 1;
         long size = 10;

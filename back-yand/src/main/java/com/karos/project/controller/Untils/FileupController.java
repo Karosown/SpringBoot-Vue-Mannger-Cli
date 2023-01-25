@@ -11,6 +11,7 @@
 package com.karos.project.controller.Untils;
 
 import cn.hutool.core.img.ImgUtil;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.karos.KaTool.qiniu.impl.QiniuServiceImpl;
 import com.karos.project.annotation.AllLimitCheck;
 import com.karos.project.common.BaseResponse;
@@ -18,6 +19,7 @@ import com.karos.KaTool.io.ImageUtils;
 import com.karos.project.common.ErrorCode;
 import com.karos.project.common.ResultUtils;
 import com.karos.project.exception.BusinessException;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +45,8 @@ public class FileupController {
     QiniuServiceImpl qiniuService;
     @PostMapping("/upload")
     @AllLimitCheck(mustText = "文件上传")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "文件上传")
     public BaseResponse fileUpload(@RequestParam("file")MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         File tempFile = null;
@@ -61,6 +65,8 @@ public class FileupController {
 
     @PostMapping("/i2b/img")
     @AllLimitCheck(mustText = "图片转Base64编码")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "图片转Base64编码")
     public BaseResponse img2base64(@RequestParam("image")MultipartFile image){
         String originalFilename = image.getOriginalFilename();
         File tempFile = null;
@@ -76,7 +82,9 @@ public class FileupController {
     }
 
     @GetMapping ("/i2b/src")
-    @AllLimitCheck(mustText = "图片url转Base64编码")
+    @AllLimitCheck(mustText = "url图片转Base64编码")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "url图片转base64编码")
     public BaseResponse img2base64Url(@RequestParam("url")String src){
         File tempFile= null;
         String encode = null;

@@ -12,11 +12,13 @@ package com.karos.project.controller.Untils;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.DigestUtil;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.karos.KaTool.iputils.IpUtils;
 import com.karos.project.annotation.AllLimitCheck;
 import com.karos.project.common.*;
 import com.karos.project.exception.BusinessException;
 import com.karos.project.model.dto.checkcode.CheckCodeRequest;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
@@ -48,6 +50,8 @@ public class CheckCodeController {
      * @param httpServletResponse
      */
     @GetMapping("/touch/{datestamp}")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "验证码生成接口")
     public BaseResponse touch(@PathVariable("datestamp") String datestamp, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         if (!StringUtils.isNumeric(datestamp))  throw new BusinessException(ErrorCode.PARAMS_ERROR);
         String ip = IpUtils.getIpAddr(httpServletRequest);
@@ -69,6 +73,8 @@ public class CheckCodeController {
 
     @PostMapping("/send")
     @AllLimitCheck(mustText = "验证码发送")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "验证码发送接口")
     public BaseResponse<String> send(@RequestBody CheckCodeRequest checkCodeRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
 
         String mail=checkCodeRequest.getUserMail();
@@ -89,7 +95,7 @@ public class CheckCodeController {
         hashOperations.delete("checkcode_sms",mail);
         String code_sms = new GenerateCodeUtil(salt).touchTextCode(mail, 6);
         hashOperations.put("checkcode_sms",mail,code_sms.toUpperCase(Locale.ROOT));
-        emailUtils.setMessage(mail,"【掌印文章】信息验证服务","【掌印文章】您的验证码为"+code_sms);
+        emailUtils.setMessage(mail,"【信息管理系统】信息验证服务","【掌印文章】您的验证码为"+code_sms);
         emailUtils.send();
         return ResultUtils.success("验证码已经发送到您的邮箱");
     }
