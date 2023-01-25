@@ -1,1 +1,2 @@
 *.html linguist-language=false
+*.js linguist-language-vue
