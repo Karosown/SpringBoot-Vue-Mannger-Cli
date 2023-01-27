@@ -29,7 +29,7 @@ npm install vue-router@4
 npm install axios
 npm install @wangeditor/editor --save
 npm install @wangeditor/editor-for-vue --save
-npm install @wangeditor/plugin-md--save
+npm install @wangeditor/plugin-md --save
 npm install element-ui --save
 npm install view-ui-plus 
 npm install prismjs
