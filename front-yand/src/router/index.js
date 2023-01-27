@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import loginPage from "@/view/loginPage";
 import manggerCenter from "@/view/manggerCenter";
 import siteSettingPage from "@/view/manngger-main/siteSettingPage";
-import {globalValue} from "@/config/varconfig";
+import {globalValue} from "@/config/CommonConfig/globalconfig";
 import apiDoc from "@/view/manngger-main/apiDoc";
 import classPage from "@/view/manngger-main/classPage";
 import articlePage from "@/view/manngger-main/articlePage";

@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import {sysLogin} from "@/config/apiconfig";
+import {sysLogin} from "@/config/ApiConfig/apiconfig";
 import {loginForm} from "@/config/varConfig/userVarConfig/userVarConfig";
 import GlobelFooter from "@/components/globelFooter";
 

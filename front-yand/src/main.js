@@ -6,9 +6,9 @@ import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
 // 引入axios
 import axios from 'axios';
-import {baseAPI,sysGetlogin} from "@/config/apiconfig";
+import {baseAPI,sysGetlogin} from "@/config/ApiConfig/apiconfig";
 import router from "@/router";
-import {globalValue} from "@/config/varconfig";
+import {globalValue} from "@/config/CommonConfig/globalconfig";
 // 挂载到vue原型链上
 axios.defaults.baseURL=baseAPI;
 axios.defaults.crossDomain = true;
@@ -16,6 +16,13 @@ axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权�
 Vue.prototype.axios=axios;
 Vue.config.productionTip = false;
 
+// 对于一些需要监视的sessionStorage的变量可任意选择使用resetSetItem函数，当然，也要用监视器
+/**
+ *      window.addEventListener('setItem',()=>{
+ *         this.list=JSON.parse(sessionStorage.getItem('notelist'))
+ *         this.isSearchOrFavorite=JSON.parse(sessionStorage.getItem('isSearchOrFavorite'))
+ *       })
+ */
 Vue.prototype.resetSetItem = function (key, newVal) {
   if (key === 'articlelist') {
     // 创建一个StorageEvent事件
@@ -34,6 +41,7 @@ Vue.prototype.resetSetItem = function (key, newVal) {
 }
 
 
+// 进入页面前校验
 router.beforeEach((to,from,next)=>{
   if (to.meta.title) document.title=to.meta.title
   else document.title=globalValue.protectTitle();

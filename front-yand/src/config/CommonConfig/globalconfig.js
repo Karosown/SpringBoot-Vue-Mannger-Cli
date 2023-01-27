@@ -1,6 +1,6 @@
 //项目名
 import {getAttributeByCommon} from "@/config/ApiConfig/commonApiConfig/commonApiConfig";
-import {baseAPI} from "@/config/apiconfig";
+import {baseAPI} from "@/config/ApiConfig/apiconfig";
 
 let globalValue={
 protectTitle() {

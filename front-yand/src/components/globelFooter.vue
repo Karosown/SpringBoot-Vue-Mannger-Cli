@@ -5,8 +5,8 @@
 </template>
 
 <script>
-import {getValueofAttribute} from "@/config/apiconfig";
-import {globalValue} from "@/config/varconfig";
+import {getValueofAttribute} from "@/config/ApiConfig/apiconfig";
+import {globalValue} from "@/config/CommonConfig/globalconfig";
 
 export default {
   name: "globelFooter",
