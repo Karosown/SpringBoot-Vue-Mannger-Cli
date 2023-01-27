@@ -1,6 +1,7 @@
 <template>
 <div id="manggerCenter">
   <el-container>
+
     <el-aside width="300px">
       <mangger-lefter></mangger-lefter>
     </el-aside>

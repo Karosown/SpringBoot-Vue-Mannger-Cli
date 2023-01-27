@@ -16,13 +16,17 @@
       </el-col>
     </el-header>
     <el-main>
-      <el-table
+      <el-table border lazy
           :data="articleDatas"
-          style="width: 100%">
+          style="width: 100%"
+
+      >
+        <el-table-column type="selection" width="39"></el-table-column>
         <el-table-column
             property="createTime"
             label="日期"
-            width="180">
+            sortable
+            width="159">
         </el-table-column>
         <el-table-column
             property="articleTitle"
@@ -32,7 +36,7 @@
         <el-table-column
             property="articleUrl"
             label="OSS地址"
-            width="250">
+            width="200">
         </el-table-column>
         <el-table-column
             property="articleIntroduction"
@@ -42,29 +46,32 @@
         <el-table-column
             property="type"
             label="文章分类"
-            width="180">
+            width="145">
         </el-table-column>
         <el-table-column
             property="label"
             label="文章标签"
+            sortable
             width="180">
         </el-table-column>
         <el-table-column
             property=""
             label="作者"
-            width="180">
+            sortable
+            width="80">
         </el-table-column>
         <el-table-column
             property="isPublic"
             label="文章状态"
-            width="250">
+            sortable
+            width="80">
           <template slot-scope="scope">
-            <el-tag type="warning" v-if="!scope.isPublic">草稿</el-tag>
+            <el-tag type="warning" v-if="!scope.row.isPublic">草&emsp;稿</el-tag>
             <el-tag v-else>已发布</el-tag>
 
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="143">
           <template slot-scope="scope">
             <el-button type="primary"
                 size="mini"

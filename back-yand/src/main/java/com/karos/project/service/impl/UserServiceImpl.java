@@ -206,7 +206,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         HashOperations hashOperations = redisTemplate.opsForHash();
         String UID = Long.valueOf(userId).toString();
         if (hashOperations.hasKey("LoginUser", UID)) {
-            currentUser= (User) hashOperations.get("LoginUser", UID);
+            currentUser= (User) hashOperations.get("LoginUser",     UID);
         }
         else {
             currentUser = this.getById(userId);

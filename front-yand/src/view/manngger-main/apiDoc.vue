@@ -1,11 +1,11 @@
 <template>
-<div >
+<div>
   <el-radio v-model="open" :label='0'>彩色版</el-radio>
   <el-radio v-model="open" :label='1'>简洁版</el-radio>
   <div :key="new Date().getTime()">
-    <iframe src="/doc/Apidocstyle.html" v-if="!open">
+    <iframe src="static/doc/Apidocstyle.html" v-if="!open">
     </iframe>
-    <iframe src="/doc/Apidocmarkdown.html" v-else>
+    <iframe src="static/doc/Apidocmarkdown.html" v-else>
     </iframe>
   </div>
 </div>

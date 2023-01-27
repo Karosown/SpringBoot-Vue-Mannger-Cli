@@ -3,3 +3,4 @@
 /front-yand/.idea/
 /back-yand/src/main/resources/application-prod.yml
 /front-yand/dist/
+/back-yand/src/main/resources/application-dev.yml
