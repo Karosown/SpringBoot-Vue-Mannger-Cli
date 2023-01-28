@@ -1,5 +1,6 @@
 package com.karos.project.service;
 
+import cn.katool.Exception.KaToolException;
 import com.karos.project.model.entity.Articlethumbrecords;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -12,5 +13,5 @@ import javax.servlet.http.HttpServletRequest;
 */
 public interface ArticlethumbrecordsService extends IService<Articlethumbrecords> {
 
-    Boolean thumb(Articlethumbrecords entity, HttpServletRequest request);
+    Boolean thumb(Articlethumbrecords entity, HttpServletRequest request) throws KaToolException;
 }

@@ -42,7 +42,10 @@ public class ArticleAddRequest implements Serializable {
      */
     private Integer isPublic;
 
-
+    /**
+     * 定时发布
+     */
+    private Date scheduledTime;
     /**
      * IP地址
      */
