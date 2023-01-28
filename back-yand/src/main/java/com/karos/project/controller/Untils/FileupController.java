@@ -12,10 +12,10 @@ package com.karos.project.controller.Untils;
 
 import cn.hutool.core.img.ImgUtil;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
-import com.karos.KaTool.qiniu.impl.QiniuServiceImpl;
+import cn.katool.qiniu.impl.QiniuServiceImpl;
 import com.karos.project.annotation.AllLimitCheck;
 import com.karos.project.common.BaseResponse;
-import com.karos.KaTool.io.ImageUtils;
+import cn.katool.io.ImageUtils;
 import com.karos.project.common.ErrorCode;
 import com.karos.project.common.ResultUtils;
 import com.karos.project.exception.BusinessException;

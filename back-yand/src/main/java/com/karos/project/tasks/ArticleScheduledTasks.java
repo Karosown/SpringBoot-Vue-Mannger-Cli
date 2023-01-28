@@ -12,6 +12,7 @@ package com.karos.project.tasks;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.katool.Exception.KaToolException;
 import com.karos.project.constant.LockConstant;
 import com.karos.project.constant.RedisKeysConstant;
 import com.karos.project.mapper.ArticlethumbrecordsMapper;
@@ -47,7 +48,7 @@ public class ArticleScheduledTasks extends ScheduledTasks{
     @Resource
     ArticleService articleService;
     @Scheduled(cron = "0 0 0/5 * * ? ")
-    public void PersistenceThumbs(){
+    public void PersistenceThumbs() throws KaToolException {
         //加锁
         lockUtil.DistributedLock(LockConstant.ThumbsLock_Pers,10L, TimeUnit.SECONDS);
         //持久化

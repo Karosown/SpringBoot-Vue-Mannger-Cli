@@ -13,7 +13,7 @@ package com.karos.project.controller.Untils;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
-import com.karos.KaTool.iputils.IpUtils;
+import cn.katool.iputils.IpUtils;
 import com.karos.project.annotation.AllLimitCheck;
 import com.karos.project.common.*;
 import com.karos.project.exception.BusinessException;
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import com.karos.KaTool.CheckCode.GenerateCodeUtil;
+import cn.katool.CheckCode.GenerateCodeUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;

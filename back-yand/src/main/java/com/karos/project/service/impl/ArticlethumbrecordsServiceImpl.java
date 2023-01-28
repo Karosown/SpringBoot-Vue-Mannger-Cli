@@ -1,8 +1,9 @@
 package com.karos.project.service.impl;
 
 import cn.hutool.core.util.BooleanUtil;
+import cn.katool.Exception.KaToolException;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.karos.KaTool.lock.LockUtil;
+import cn.katool.lock.LockUtil;
 import com.karos.project.common.ErrorCode;
 import com.karos.project.constant.RedisKeysConstant;
 import com.karos.project.exception.BusinessException;
@@ -38,7 +39,7 @@ public class ArticlethumbrecordsServiceImpl extends ServiceImpl<Articlethumbreco
     @Resource
     LockUtil lockUtil;
     @Override
-    public Boolean thumb(Articlethumbrecords entity, HttpServletRequest request) {
+    public Boolean thumb(Articlethumbrecords entity, HttpServletRequest request) throws KaToolException {
         if (StringUtils.isAnyBlank(entity.getArticleId())){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }

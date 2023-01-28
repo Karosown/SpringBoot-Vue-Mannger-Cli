@@ -13,15 +13,20 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.cron.CronUtil;
+import cn.hutool.cron.task.Task;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.katool.Exception.KaToolException;
+import cn.katool.dateutil.expDateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
-import com.karos.KaTool.iputils.IpUtils;
-import com.karos.KaTool.lock.LockUtil;
-import com.karos.KaTool.qiniu.impl.QiniuServiceImpl;
+import cn.katool.iputils.IpUtils;
+import cn.katool.lock.LockUtil;
+import cn.katool.qiniu.impl.QiniuServiceImpl;
 import com.karos.project.annotation.AuthCheck;
 import com.karos.project.common.BaseResponse;
 import com.karos.project.common.DeleteRequest;
@@ -79,13 +84,17 @@ public class ArticleController {
     @AuthCheck(mustRole = "admin")
     @GetMapping("/LockTest")
     public BaseResponse<String> test(@RequestParam("expTime") Long expTime){
-        lockUtil.DistributedLock(RedisKeysConstant.ThumbsHistoryHash.intern(),expTime, TimeUnit.SECONDS);
+        try {
+            lockUtil.DistributedLock(RedisKeysConstant.ThumbsHistoryHash.intern(),expTime, TimeUnit.SECONDS);
+        } catch (KaToolException e) {
+            throw new BusinessException(e.getCode(),e.getMessage());
+        }
         return ResultUtils.success("上锁成功，请在20s内进行测试操作");
     }
     @PostMapping("/thumb")
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "文章点赞接口")
-    public BaseResponse<Boolean> thumbArticle(@RequestBody ArticleDoThumbRequest articleDoThumbRequest, HttpServletRequest request){
+    public BaseResponse<Boolean> thumbArticle(@RequestBody ArticleDoThumbRequest articleDoThumbRequest, HttpServletRequest request) throws KaToolException {
         Articlethumbrecords articlethumbrecords = new Articlethumbrecords();
         articlethumbrecords.setArticleId(articleDoThumbRequest.getArticleId());
         articlethumbrecords.setThumbTime(new Date());
@@ -162,6 +171,27 @@ public class ArticleController {
             articlehistory.setIp(article.getIP());
             articlehistory.setVersion(1L);
             articlehistory.setUpdateTime(new Date());
+            Date scheduledTime = articleAddRequest.getScheduledTime();
+            if (ObjectUtil.isNotEmpty(scheduledTime)){
+                String corn =null;
+                try {
+                    corn=expDateUtil.getCorn(scheduledTime);
+                } catch (KaToolException e) {
+                    throw new BusinessException(e);
+                }
+                String finalNewArticleId = newArticleId;
+                CronUtil.schedule(corn, new Task() {
+                    @Override
+                    public void execute() {
+                        QueryWrapper<Article> queryWrapper=new QueryWrapper<>();
+                        queryWrapper.eq("id", finalNewArticleId);
+                        Article one = articleService.getOne(queryWrapper);
+                        one.setIsPublic(1);
+                        articleService.updateById(one);
+                        log.info("定时文章ID={}发布添加成功,添加时间{},等待发布时间{}",finalNewArticleId,new Date(),scheduledTime);
+                    }
+                });
+            }
             articlehistoryService.save(articlehistory);
         }
         return ResultUtils.success(newArticleId,"添加成功");

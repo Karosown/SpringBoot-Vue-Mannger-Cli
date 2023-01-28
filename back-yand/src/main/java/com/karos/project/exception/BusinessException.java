@@ -1,5 +1,6 @@
 package com.karos.project.exception;
 
+import cn.katool.Exception.KaToolException;
 import com.karos.project.common.ErrorCode;
 import springfox.documentation.spi.service.contexts.ResponseContext;
 
@@ -21,7 +22,10 @@ public class BusinessException extends RuntimeException {
         super(errorCode.getMessage());
         this.code = errorCode.getCode();
     }
-
+    public BusinessException(KaToolException kaToolException) {
+        super(kaToolException.getMessage());
+        this.code = kaToolException.getCode();
+    }
     public BusinessException(ErrorCode errorCode, String message) {
         super(message);
         this.code = errorCode.getCode();
