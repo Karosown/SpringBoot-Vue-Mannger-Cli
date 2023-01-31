@@ -45,7 +45,7 @@
     </el-collapse-item>
     <el-collapse-item title="分类与标签" name="2">
         <e-row>
-
+          <span>分类</span>
         </e-row>
       <e-row>
         <e-col>

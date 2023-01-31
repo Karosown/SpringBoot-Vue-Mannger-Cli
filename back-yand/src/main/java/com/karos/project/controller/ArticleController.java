@@ -10,10 +10,8 @@
 
 package com.karos.project.controller;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.cron.CronUtil;
@@ -39,15 +37,10 @@ import com.karos.project.model.dto.article.ArticleAddRequest;
 import com.karos.project.model.dto.article.ArticleDoThumbRequest;
 import com.karos.project.model.dto.article.ArticleQueryRequest;
 import com.karos.project.model.dto.article.ArticleUpdateRequest;
-import com.karos.project.model.entity.Article;
-import com.karos.project.model.entity.Articlehistory;
-import com.karos.project.model.entity.Articlethumbrecords;
-import com.karos.project.model.entity.User;
-import com.karos.project.model.vo.ArticleVo;
-import com.karos.project.service.ArticleService;
-import com.karos.project.service.ArticlehistoryService;
-import com.karos.project.service.ArticlethumbrecordsService;
-import com.karos.project.service.UserService;
+import com.karos.project.model.entity.*;
+import com.karos.project.model.vo.article.ArticleTypeVo;
+import com.karos.project.model.vo.article.ArticleVo;
+import com.karos.project.service.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -58,8 +51,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -80,7 +71,8 @@ public class ArticleController {
     private ArticlethumbrecordsService articlethumbrecordsService;
     @Resource
     LockUtil lockUtil;
-
+    @Resource
+    private ArticleTypeService articleTypeService;
     @AuthCheck(mustRole = "admin")
     @GetMapping("/LockTest")
     public BaseResponse<String> test(@RequestParam("expTime") Long expTime){
@@ -90,6 +82,13 @@ public class ArticleController {
             throw new BusinessException(e.getCode(),e.getMessage());
         }
         return ResultUtils.success("上锁成功，请在20s内进行测试操作");
+    }
+    @GetMapping("/get/typelist")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "文章分类列表获取接口")
+    public BaseResponse<List<ArticleTypeVo>> getTypeList(){
+        log.info("1");
+        return ResultUtils.success(articleTypeService.allList());
     }
     @PostMapping("/thumb")
     @ApiOperationSupport(author = "Karos")

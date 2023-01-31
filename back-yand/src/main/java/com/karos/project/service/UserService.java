@@ -13,6 +13,10 @@ import javax.servlet.http.HttpServletRequest;
  * @author karos
  */
 public interface UserService extends IService<User> {
+    Boolean reduceOnlineUserNum(HttpServletRequest request);
+
+    Boolean increaseOnlineUserNum(HttpServletRequest request);
+    Integer getOnlineUserNum(HttpServletRequest request);
     String getUserName(String userAccount,Long id);
     /**
      * 获取用户头像地址

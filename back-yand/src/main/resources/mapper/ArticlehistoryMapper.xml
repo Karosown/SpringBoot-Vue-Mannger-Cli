@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.generator.mapper.ArticlehistoryMapper">
+<mapper namespace="com.karos.project.mapper.ArticlehistoryMapper">
 
     <resultMap id="BaseResultMap" type="com.karos.project.model.entity.Articlehistory">
             <id property="id" column="id" jdbcType="VARCHAR"/>

@@ -1,4 +1,4 @@
-package com.karos.project.model.vo;
+package com.karos.project.model.vo.article;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.karos.project.model.entity.Article;

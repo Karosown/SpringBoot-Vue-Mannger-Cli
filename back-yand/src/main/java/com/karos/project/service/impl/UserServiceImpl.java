@@ -28,8 +28,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static com.karos.project.constant.UserConstant.ADMIN_ROLE;
-import static com.karos.project.constant.UserConstant.USER_LOGIN_STATE;
+import static com.karos.project.constant.UserConstant.*;
 
 
 /**
@@ -52,6 +51,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * 盐值，混淆密码
      */
     private static final String SALT = "karos";
+
+    @Override
+    public Boolean reduceOnlineUserNum(HttpServletRequest request) {
+        request.getSession().getServletContext().setAttribute(USER_ONLINE_NUM,getOnlineUserNum(request)-1);
+        return true;
+    }
+
+    @Override
+    public Boolean increaseOnlineUserNum(HttpServletRequest request) {
+        request.getSession().getServletContext().setAttribute(USER_ONLINE_NUM,getOnlineUserNum(request)+1);
+        return true;
+    }
+
+    @Override
+    public Integer getOnlineUserNum(HttpServletRequest request) {
+       Integer Num = (Integer) request.getSession().getServletContext().getAttribute(USER_ONLINE_NUM);
+       if (ObjectUtils.isEmpty(Num))return 0;
+       return Num;
+
+    }
 
     @Override
     public String getUserName(String userAccount, Long id) {
@@ -184,6 +203,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 3. 记录用户的登录态
         request.getSession().setAttribute( USER_LOGIN_STATE, user);
+        increaseOnlineUserNum(request);
         return user;
     }
 
@@ -252,6 +272,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         redisTemplate.opsForHash().delete("LoginUser",id.toString());
         // 移除登录态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
+        reduceOnlineUserNum(request);
         return true;
     }
 
