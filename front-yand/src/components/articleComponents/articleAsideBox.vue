@@ -15,17 +15,56 @@
 
   <el-collapse v-model="activeNames" @change="handleChange">
     <el-collapse-item title="文章摘要" name="1">
-      发布 <el-button type="text">草稿</el-button>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item>草稿</el-dropdown-item>
-        <el-dropdown-item>发布</el-dropdown-item>
-      </el-dropdown-menu>
+      <el-row>
+        <el-col span="8">
+        <span class="text-title">发布</span>
+        </el-col>
+        <el-col span="8">
+          <el-dropdown>
+        <el-button type="text">{{!articleBody.isPublic?"草稿":"发布"}}</el-button>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item @click.native="articleBody.isPublic=0">草稿</el-dropdown-item>
+          <el-dropdown-item @click.native="articleBody.isPublic=1">发布</el-dropdown-item>
+        </el-dropdown-menu>
+          </el-dropdown>
+          </el-col>
+      </el-row>
+      <el-row>
+        <el-col span="8">
+         <span class="text-title">定时发布</span>
+        </el-col>
+          <el-col span="8">
+
+          <el-date-picker
+            v-model="articleBody.publishTime"
+            type="datetime"
+            placeholder="选择日期时间,留空为不选择">
+        </el-date-picker>
+          </el-col>
+      </el-row>
     </el-collapse-item>
-    <el-collapse-item title="反馈 Feedback" name="2">
-      <div>控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；</div>
-      <div>页面反馈：操作后，通过页面元素的变化清晰地展现当前状态。</div>
+    <el-collapse-item title="分类与标签" name="2">
+        <e-row>
+
+        </e-row>
+      <e-row>
+        <e-col>
+          <span>标签</span>
+          <el-input v-model="tempLabel" @keyup.enter.native="addLabel" placeholder="请输入标签"></el-input>
+          <el-tag
+              style="margin: 5px"
+              :key="tag"
+              v-for="tag in articleBody.labelList"
+              closable
+              :disable-transitions="false"
+              @close="articleBody.labelList.splice(articleBody.labelList.indexOf(tag),1)"
+          >
+            {{tag}}
+          </el-tag>
+        </e-col>
+      </e-row>
     </el-collapse-item>
-    <el-collapse-item title="效率 Efficiency" name="3">
+    <el-collapse-item title="特色图片" name="3">
       <div>简化流程：设计简洁直观的操作流程；</div>
       <div>清晰明确：语言表达清晰且表意明确，让用户快速理解进而作出决策；</div>
       <div>帮助用户识别：界面简单直白，让用户快速识别而非回忆，减少用户记忆负担。</div>
@@ -38,11 +77,27 @@
 </template>
 
 <script>
+
+
 export default {
-  name: "articleAsideBox"
+  name: "articleAsideBox",
+  data(){
+    return{
+      articleBody:this.$parent.$parent.$parent.$parent.articleAddRequest,
+      tempLabel:null
+    }
+  },
+  methods:{
+    addLabel(){
+      let items = this.tempLabel;
+      this.articleBody.labelList.push(items)
+    }
+  }
 }
 </script>
 
 <style scoped>
-
+.text-title{
+  margin-left: 25px;
+}
 </style>

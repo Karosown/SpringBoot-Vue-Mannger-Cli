@@ -201,7 +201,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
-        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        //解释一下为什么要从数据库拿，为了保证每次拿到的都是最新数据
         long userId = currentUser.getId();
         HashOperations hashOperations = redisTemplate.opsForHash();
         String UID = Long.valueOf(userId).toString();

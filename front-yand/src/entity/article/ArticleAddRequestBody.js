@@ -4,34 +4,34 @@ export class ArticleAddRequest{
     /**
      * 所属用户ID
      */
-    userId;
+    userId=null;
 
     /**
      * 文章标题
      */
-    articleTitle;
+    articleTitle=null;
     /**
      * 文章内容
      */
-    articleText;
+    articleText=null;
     /**
      * 类型
      */
-    type;
+    type=0;
     /**
      * 标签
      */
-    labelList;
+    labelList=[];
 
     /**
      * 是否公开（0为否，1为公开）
      */
-   isPublic;
+    isPublic=0;
 
+    publishTime=null;
 
-    /**
-     * IP地址
-     */
-    IP;
+    
 
+    constructor() {
+    }
 }

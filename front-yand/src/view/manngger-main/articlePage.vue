@@ -102,7 +102,7 @@
 
 <script>
 import {getArticleslistPage} from "@/config/ApiConfig/articleApiConfig/articleApiConfig";
-import {articleQureyRequestBody} from "@/entity/article/ariticleQueryRequestBody";
+import {articleQureyRequestBody} from "@/entity/article/AriticleQueryRequestBody";
 
 export default {
   name: "articlePage",

@@ -171,11 +171,11 @@ public class ArticleController {
             articlehistory.setIp(article.getIP());
             articlehistory.setVersion(1L);
             articlehistory.setUpdateTime(new Date());
-            Date scheduledTime = articleAddRequest.getScheduledTime();
-            if (ObjectUtil.isNotEmpty(scheduledTime)){
+            Date publishTime = articleAddRequest.getPublishTime();
+            if (ObjectUtil.isNotEmpty(publishTime)){
                 String corn =null;
                 try {
-                    corn=expDateUtil.getCorn(scheduledTime);
+                    corn=expDateUtil.getCorn(publishTime);
                 } catch (KaToolException e) {
                     throw new BusinessException(e);
                 }
@@ -188,7 +188,7 @@ public class ArticleController {
                         Article one = articleService.getOne(queryWrapper);
                         one.setIsPublic(1);
                         articleService.updateById(one);
-                        log.info("定时文章ID={}发布添加成功,添加时间{},等待发布时间{}",finalNewArticleId,new Date(),scheduledTime);
+                        log.info("定时文章ID={}发布添加成功,添加时间{},等待发布时间{}",finalNewArticleId,new Date(),publishTime);
                     }
                 });
             }

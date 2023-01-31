@@ -19,9 +19,15 @@
 <script>
 import ArticleAsideBox from "@/components/articleComponents/articleAsideBox";
 import EditorBox from "@/components/Editor/editorBox";
+import {ArticleAddRequest} from "@/entity/article/ArticleAddRequestBody";
 export default {
   name: "ariticlePublishPage",
-  components: {EditorBox, ArticleAsideBox}
+  components: {EditorBox, ArticleAsideBox},
+  data(){
+    return{
+      articleAddRequest:new ArticleAddRequest()
+    }
+  }
 }
 </script>
 

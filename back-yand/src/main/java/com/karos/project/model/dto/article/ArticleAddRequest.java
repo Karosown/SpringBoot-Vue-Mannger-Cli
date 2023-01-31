@@ -45,7 +45,7 @@ public class ArticleAddRequest implements Serializable {
     /**
      * 定时发布
      */
-    private Date scheduledTime;
+    private Date publishTime;
     /**
      * IP地址
      */
