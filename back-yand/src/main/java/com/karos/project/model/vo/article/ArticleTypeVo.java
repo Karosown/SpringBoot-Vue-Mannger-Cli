@@ -16,13 +16,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.karos.project.model.entity.ArticleType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class ArticleTypeVo {
     @TableId(type = IdType.AUTO)
     @JsonProperty("value")

@@ -17,7 +17,7 @@
     <el-collapse-item title="文章摘要" name="1">
       <el-row>
         <el-col span="8">
-        <span class="text-title">发布</span>
+            <span class="text-title">发布</span>
         </el-col>
         <el-col span="8">
           <el-dropdown>
@@ -45,12 +45,25 @@
     </el-collapse-item>
     <el-collapse-item title="分类与标签" name="2">
         <e-row>
+          <el-col span="8">
           <span>分类</span>
+          </el-col>
+          <el-col span="16">
+           <el-cascader
+              :options="types"
+              clearable></el-cascader>
+          </el-col>
         </e-row>
       <e-row>
-        <e-col>
-          <span>标签</span>
-          <el-input v-model="tempLabel" @keyup.enter.native="addLabel" placeholder="请输入标签"></el-input>
+        <e-row>
+            <e-col span="8">
+              <span>标签</span>
+            </e-col>
+          <e-col span="16">
+            <el-input v-model="tempLabel" @keyup.enter.native="addLabel" placeholder="请输入标签"></el-input>
+          </e-col>
+        </e-row>
+        <e-row>
           <el-tag
               style="margin: 5px"
               :key="tag"
@@ -61,7 +74,7 @@
           >
             {{tag}}
           </el-tag>
-        </e-col>
+        </e-row>
       </e-row>
     </el-collapse-item>
     <el-collapse-item title="特色图片" name="3">
@@ -79,12 +92,15 @@
 <script>
 
 
+import {getTypelist} from "@/config/ApiConfig/articleApiConfig/articleApiConfig";
+
 export default {
   name: "articleAsideBox",
   data(){
     return{
       articleBody:this.$parent.$parent.$parent.$parent.articleAddRequest,
-      tempLabel:null
+      tempLabel:null,
+      types:null
     }
   },
   methods:{
@@ -92,12 +108,20 @@ export default {
       let items = this.tempLabel;
       this.articleBody.labelList.push(items)
     }
+  },
+  mounted() {
+    this.axios.get(getTypelist)
+        .then(res=>{
+          if (!res.data.code){
+            this.types=res.data.data
+          }
+        })
   }
 }
 </script>
 
 <style scoped>
-.text-title{
+span{
   margin-left: 25px;
 }
 </style>
