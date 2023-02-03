@@ -29,6 +29,14 @@ const router = new VueRouter({
                 title:globalValue.protectTitle()+globalValue.protectTitle+'用户登录'
             }
         },
+        // {
+        //     path:'/loginpage',
+        //     component:loginPage,
+        //     meta:{
+        //         title:globalValue.protectTitle(),
+        //         mustLogin:true
+        //     }
+        // },
         {
             path:'/manggerCenter',
             component: manggerCenter,

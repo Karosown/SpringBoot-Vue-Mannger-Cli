@@ -57,7 +57,7 @@ export default {
 
 <style scoped>
 #login{
-  background: url("https://tu.ltyuanfang.cn/api/fengjing.php");
+  background: url("https://api.btstu.cn/sjbz/api.php?lx=fengjing&format=images");
   height: 100%;
   width: 100%;
   /*background: no-repeat;*/
