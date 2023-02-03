@@ -1,5 +1,6 @@
 <template>
  <div id="siteSettingPage">
+   <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
   <el-row style="margin-bottom: 25px">
     <b>
      <el-col span="2" style="margin-left: 40px">属性名</el-col>
@@ -8,17 +9,20 @@
     </b>
   </el-row>
    <el-form ref="form" :model="form" label-width="100px">
-     <div  v-for="(item,index) in form.commonList" :key="index">
-     <el-form-item :label="item.attribute">
-      <el-col>
-        <input type="file" v-if="item.type" @change="submit($event,item)"  name="file"/>
-      </el-col>
-      <el-col span="10">
-        <el-input v-model="item.value"></el-input>
-      </el-col>
+<!--    把div改为checkbox-group-->
+     <el-checkbox-group v-model="checklist">
+       <el-checkbox v-for="(item) in form.commonList"  :label="item.attribute" :key="item.attribute">
+<!--     <el-form-item :label="item.attribute">-->
+            <el-col>
+              <input type="file" v-if="item.type" @change="submit($event,item)"  name="file"/>
+            </el-col>
+            <el-col span="10">
+              <el-input v-model="item.value"></el-input>
+            </el-col>
          <span style="margin-left:20px;color: #989aa2">{{item.comment}}</span>
-     </el-form-item>
-     </div>
+<!--     </el-form-item>-->
+       </el-checkbox>
+     </el-checkbox-group>
      <el-form-item>
        <el-button type="primary" @click="save" :disabled="disabled">保存</el-button>
        <el-button type="primary" @click="addbox=true">新增一项</el-button>
@@ -75,6 +79,7 @@ export default {
   name: "siteSettingPage",
   data(){
     return{
+      checklist:[],
       form:{
         commonList:[]
       },
