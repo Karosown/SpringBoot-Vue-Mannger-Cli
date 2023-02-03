@@ -22,6 +22,7 @@
      <el-form-item>
        <el-button type="primary" @click="save" :disabled="disabled">保存</el-button>
        <el-button type="primary" @click="addbox=true">新增一项</el-button>
+       <el-button type="primary" @click="removebox=true">删除</el-button>
      </el-form-item>
    </el-form>
    <el-dialog
@@ -29,6 +30,11 @@
        :visible.sync="addbox"
        width="30%"
        center>
+         <el-table-column
+      type="selection"
+      width="55">
+   
+    </el-table-column>
      <el-form v-model="newCommon">
        <el-form-item label="属性名">
          <el-input v-model="newCommon.attribute"></el-input>

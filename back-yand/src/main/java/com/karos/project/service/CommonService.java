@@ -2,6 +2,7 @@ package com.karos.project.service;
 
 import com.karos.project.model.entity.Common;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.stereotype.Component;
 
 /**
 * @author 30398
