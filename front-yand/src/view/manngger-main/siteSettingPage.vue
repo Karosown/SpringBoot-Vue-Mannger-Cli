@@ -1,9 +1,8 @@
 <template>
  <div id="siteSettingPage">
-   <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
   <el-row style="margin-bottom: 25px">
     <b>
-     <el-col span="2" style="margin-left: 40px">属性名</el-col>
+     <el-col span="3" style="margin-left: 40px">属性名</el-col>
      <el-col span="9">属性值</el-col>
      <el-col span="2">注释</el-col>
     </b>
@@ -11,18 +10,25 @@
    <el-form ref="form" :model="form" label-width="100px">
 <!--    把div改为checkbox-group-->
      <el-checkbox-group v-model="checklist">
-       <el-checkbox v-for="(item) in form.commonList"  :label="item.attribute" :key="item.attribute">
-<!--     <el-form-item :label="item.attribute">-->
-            <el-col>
-              <input type="file" v-if="item.type" @change="submit($event,item)"  name="file"/>
-            </el-col>
-            <el-col span="10">
-              <el-input v-model="item.value"></el-input>
-            </el-col>
-         <span style="margin-left:20px;color: #989aa2">{{item.comment}}</span>
-<!--     </el-form-item>-->
-       </el-checkbox>
+       <el-row v-for="(item) in form.commonList" :key="item.attribute" style="margin-bottom: 10px">
+       <el-col span="3">
+         <el-checkbox  size="medium" style="float: left;"  :label="item.attribute" >
+           {{item.attribute}}
+         </el-checkbox>
+       </el-col>
+       <el-col span="9">
+         <input type="file" v-if="item.type" @change="submit($event,item)"  name="file" style="display: inline"/>
+         <el-input v-model="item.value"></el-input>
+       </el-col>
+         <el-col span="10">
+           <el-link style="margin-left:3px;color: #989aa2" :unline="false">{{item.comment}}</el-link>
+         </el-col>
+       </el-row>
+       <el-col span="1">
+         <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+       </el-col>
      </el-checkbox-group>
+     <br>
      <el-form-item>
        <el-button type="primary" @click="save" :disabled="disabled">保存</el-button>
        <el-button type="primary" @click="addbox=true">新增一项</el-button>
@@ -75,10 +81,14 @@
 import {getCommonList, saveCommon} from "@/config/ApiConfig/commonApiConfig/commonApiConfig";
 import {siteNavUpload} from "@/config/ApiConfig/fileApiConfig/fileApiConfig";
 
+
 export default {
   name: "siteSettingPage",
   data(){
     return{
+      checkAll:false,
+      isIndeterminate:false,
+      //存放已经
       checklist:[],
       form:{
         commonList:[]
@@ -94,6 +104,25 @@ export default {
     }
   },
   methods:{
+
+
+    handleCheckAllChange(val){
+      if (val){
+        this.checklist=[]
+        for(var i=0;i<this.form.commonList.length;i++){
+          this.checklist.push(this.form.commonList[i].attribute)
+        }
+        this.checkAll=this.isIndeterminate=true
+      }
+      else{
+        this.checklist=[]
+        this.checkAll=this.isIndeterminate=false
+      }
+    },
+
+
+
+
     submit($event,item){
       var file=$event.target.files[0]
       if (file.size>1024*1024*320){
