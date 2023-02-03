@@ -13,9 +13,7 @@ const getArticleslistByArticleTitle=base+"/list/common?sortField=createTime&arti
 const getArticleslistByuserid=base+"/list/common?sortField=createTime&userId=";
 //新增日记api post
 const addArticles=base+"/add"
-const getTypelist=base+"/get/typelist";
 export {
-    getTypelist,
     doThumbArticle,
     deleteArticle,
     getArticleslistByFavorite,

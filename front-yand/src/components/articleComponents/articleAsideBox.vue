@@ -92,7 +92,8 @@
 <script>
 
 
-import {getTypelist} from "@/config/ApiConfig/articleApiConfig/articleApiConfig";
+
+import {getTypelist} from "@/config/ApiConfig/articleApiConfig/articleTypeApiConfig";
 
 export default {
   name: "articleAsideBox",

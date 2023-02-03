@@ -1,7 +1,7 @@
 /**
  * Title
  *
- * @ClassName: ArticleController
+ * @ClassName: ArticleTypeController
  * @Description:
  * @author: Karos
  * @date: 2022/12/28 1:58
@@ -71,8 +71,6 @@ public class ArticleController {
     private ArticlethumbrecordsService articlethumbrecordsService;
     @Resource
     LockUtil lockUtil;
-    @Resource
-    private ArticleTypeService articleTypeService;
     @AuthCheck(mustRole = "admin")
     @GetMapping("/LockTest")
     public BaseResponse<String> test(@RequestParam("expTime") Long expTime){
@@ -82,13 +80,6 @@ public class ArticleController {
             throw new BusinessException(e.getCode(),e.getMessage());
         }
         return ResultUtils.success("上锁成功，请在20s内进行测试操作");
-    }
-    @GetMapping("/get/typelist")
-    @ApiOperationSupport(author = "Karos")
-    @ApiOperation(value = "文章分类列表获取接口")
-    public BaseResponse<List<ArticleTypeVo>> getTypeList(){
-        log.info("1");
-        return ResultUtils.success(articleTypeService.allList());
     }
     @PostMapping("/thumb")
     @ApiOperationSupport(author = "Karos")

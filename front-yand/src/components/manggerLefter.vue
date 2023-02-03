@@ -9,7 +9,7 @@
         <i class="el-icon-notebook-2"></i>
         <span slot="title">文章管理</span>
       </el-menu-item>
-      <el-menu-item index="/class"  disabled>
+      <el-menu-item index="/articleTypePage">
         <i class="el-icon-chat-square"></i>
         <span slot="title">分类管理</span>
       </el-menu-item>
