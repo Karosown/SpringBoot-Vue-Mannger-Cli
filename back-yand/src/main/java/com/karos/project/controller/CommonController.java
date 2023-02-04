@@ -64,6 +64,7 @@ public class CommonController {
         List<Common> list = commonService.list(queryWrapper);
         return ResultUtils.success(list);
     }
+
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "保存所有所有属性和其值")
     @PostMapping("/save")
@@ -71,6 +72,7 @@ public class CommonController {
         boolean b = commonService.saveOrUpdateBatch(commonSaveRequest.getCommonList());
         return ResultUtils.success(b);
     }
+
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "删除某些属性")
     @PostMapping("/delete")
