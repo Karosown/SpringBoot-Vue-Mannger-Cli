@@ -5,7 +5,10 @@ export class ArticleAddRequest{
      * 所属用户ID
      */
     userId=null;
-
+    /**
+     * 文章简介
+     */
+    articleIntroduction=null;
     /**
      * 文章标题
      */
@@ -29,7 +32,10 @@ export class ArticleAddRequest{
     isPublic=0;
 
     publishTime=null;
-
+    /**
+     * 特色图片
+     */
+    featImg;
     
 
     constructor() {

@@ -3,25 +3,31 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.karos.project.mapper.ArticleMapper">
-
     <resultMap id="BaseResultMap" type="com.karos.project.model.entity.Article">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="userId" column="userId" jdbcType="BIGINT"/>
-            <result property="userArticleid" column="userArticleid" jdbcType="BIGINT"/>
-            <result property="articleUrl" column="articleUrl" jdbcType="VARCHAR"/>
-            <result property="isPublic" column="isPublic" jdbcType="TINYINT"/>
-            <result property="viewNum" column="viewNum" jdbcType="BIGINT"/>
-            <result property="IP" column="IP" jdbcType="VARCHAR"/>
-            <result property="thumbNum" column="thumbNum" jdbcType="BIGINT"/>
-            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
-            <result property="upDateTime" column="upDateTime" jdbcType="TIMESTAMP"/>
-            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
-    </resultMap>
+              <result property="id" column="id" jdbcType="VARCHAR"/>
+              <result property="userId" column="userId" jdbcType="BIGINT"/>
+              <result property="userArticleid" column="userArticleid" jdbcType="BIGINT"/>
+              <result property="articleTitle" column="articleTitle" jdbcType="VARCHAR"/>
+              <result property="articleIntroduction" column="articleIntroduction" jdbcType="INTEGER"/>
+              <result property="articleUrl" column="articleUrl" jdbcType="VARCHAR"/>
+              <result property="type" column="type" jdbcType="TINYINT"/>
+              <result property="labelList" column="labelList"/>
+              <result property="isPublic" column="isPublic" jdbcType="TINYINT"/>
+              <result property="viewNum" column="viewNum" jdbcType="BIGINT"/>
+              <result property="IP" column="IP" jdbcType="VARCHAR"/>
+              <result property="thumbNum" column="thumbNum" jdbcType="BIGINT"/>
+              <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+              <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+              <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+              <result property="featImg" column="featImg" jdbcType="INTEGER"/>
+      </resultMap>
 
-    <sql id="Base_Column_List">
-        id,userId,userArticleid,
-        articleUrl,isPublic,viewNum,
-        IP,thumbNum,createTime,
-        upDateTime,isDelete
-    </sql>
+      <sql id="Base_Column_List">
+          id,userId,userArticleid,
+          articleTitle,articleIntroduction,articleUrl,
+          type,labelList,isPublic,
+          viewNum,IP,thumbNum,
+          createTime,updateTime,isDelete,
+          featImg
+      </sql>
 </mapper>

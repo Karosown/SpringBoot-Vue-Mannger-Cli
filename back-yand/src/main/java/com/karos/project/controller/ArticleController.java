@@ -19,6 +19,7 @@ import cn.hutool.cron.task.Task;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.katool.Exception.KaToolException;
 import cn.katool.dateutil.expDateUtil;
+import cn.katool.io.ImageUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
@@ -118,6 +119,7 @@ public class ArticleController {
         }
         //使用工具类，Nginx反向代理后仍为真实IP
         articleAddRequest.setIP(IpUtils.getIpAddr(request));
+        articleAddRequest.setUserId(userService.getLoginUser(request).getId());
         //讲文章内容存入七牛云
         String articleText = articleAddRequest.getArticleText();
         String articleUrl =null;
@@ -144,6 +146,16 @@ public class ArticleController {
         article.setCreateTime(new Date());
         article.setArticleUrl(articleUrl);
         article.setArticleIntroduction(articleService.getIntroduction(articleAddRequest));
+        String featImg = article.getFeatImg();
+        if (StringUtils.isNotBlank(featImg)){
+            try {
+                File file = ImageUtils.base642img(featImg);
+                String s = qnsi.uploadFile(file, "/articleFeatIamg", article.getArticleTitle(), ".png", true);
+                article.setFeatImg(s);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         String newArticleId=null;
         synchronized (article.getArticleUrl().intern()) {
             articleService.validArticle(article, true);
@@ -315,7 +327,6 @@ public class ArticleController {
             BeanUtils.copyProperties(articleQueryRequest, articleQuery);
         }
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>(articleQuery);
-
         List<Article> articleList = articleService.list(queryWrapper);
         Page<Article> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize(),articleList.size());
         articlePage.setRecords(articleList);

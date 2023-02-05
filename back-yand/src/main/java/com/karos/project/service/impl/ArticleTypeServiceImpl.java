@@ -37,7 +37,7 @@ public class ArticleTypeServiceImpl extends ServiceImpl<ArticletypeMapper, Artic
                 //找到父亲，在父亲里面添加vo
                 Integer rId=0;
                 listMap.putIfAbsent(current.getId(),currentVo);
-                Integer fId=current.getFId();
+                Integer fId=current.getFid();
                 if (fId==0){
                         rId=current.getId();
                 }

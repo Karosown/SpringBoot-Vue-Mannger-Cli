@@ -1,5 +1,6 @@
 package com.karos.project.model.vo.article;
 
+import cn.hutool.json.JSON;
 import com.baomidou.mybatisplus.annotation.*;
 import com.karos.project.model.entity.Article;
 import lombok.Data;
@@ -43,7 +44,7 @@ public class ArticleVo implements Serializable {
      */
     private String articleIntroduction;
     private String type;
-    private List<String> labelList;
+    private JSON labelList;
 
     /**
      * 是否公开（0为否，1为公开）
@@ -75,6 +76,9 @@ public class ArticleVo implements Serializable {
      * 是否已点赞
      */
     private Boolean hasThumb;
-
+    /**
+     * 特色图片
+     */
+    private String featImg;
     private static final long serialVersionUID = 1L;
 }

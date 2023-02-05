@@ -49,10 +49,16 @@
             width="145">
         </el-table-column>
         <el-table-column
-            property="label"
+            property="labelList"
             label="文章标签"
-            sortable
             width="180">
+          <template slot-scope="scope">
+            <el-tag v-for="key in JSON.parse(scope.row.labelList)" :key="key"
+                    size="small"
+                    type="primary"
+                    style="margin-right: 5px"
+            >{{key}}</el-tag>
+          </template>
         </el-table-column>
         <el-table-column
             property=""

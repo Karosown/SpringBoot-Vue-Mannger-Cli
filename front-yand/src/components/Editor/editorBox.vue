@@ -8,7 +8,7 @@
     />
     <Editor
         style="height: 100vh; overflow-y: hidden;"
-        v-model="text"
+        v-model="reqbody.articleText"
         :defaultConfig="editorConfig"
         :mode="mode"
         @onCreated="onCreated"
@@ -29,7 +29,7 @@ export default {
   components: { Editor, Toolbar },
   data() {
     return {
-      text:null,
+      reqbody:this.$parent.$parent.$parent.$parent.articleAddRequest,
       editor: null,
       toolbarConfig: {},
       editorConfig: editorConfig,

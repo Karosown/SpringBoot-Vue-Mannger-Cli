@@ -9,7 +9,8 @@ protectTitle() {
     xhr.send(null)
     if (xhr.status==200) return JSON.parse(xhr.responseText).data
     else return "XXXX管理系统"
-   }
+   },
+    BASE64HEADER:"data:image/png;base64,"
 }
 
 export {

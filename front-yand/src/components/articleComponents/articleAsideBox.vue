@@ -51,7 +51,9 @@
           <el-col span="16">
            <el-cascader
               :options="types"
-              clearable></el-cascader>
+              v-model="articleBody.type"
+              clearable>
+           </el-cascader>
           </el-col>
         </e-row>
       <e-row>
@@ -79,10 +81,17 @@
     </el-collapse-item>
     <el-collapse-item title="特色图片" name="3">
       <el-upload
-          class="upload-demo"
-          drag
-          action="https://jsonplaceholder.typicode.com/posts/"
-          multiple>
+          ref="uploadlogo"
+          class="avatar-uploader"
+          action="#"
+          :http-request="uploadAvatar"
+          :show-file-list="true"
+          list-type="picture"
+          :before-upload="beforeAvatarUpload"
+          :multiple="false"
+          :limit="1"
+          auto-upload
+          drag>
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
@@ -91,7 +100,9 @@
     <el-collapse-item title="文章简介" name="4">
         <el-input type="textarea"
                   :rows="4"
-                  placeholder="留空则自动填写">
+                  placeholder="留空则自动填写"
+                v-model="articleBody.articleIntroduction"
+        >
 
         </el-input>
     </el-collapse-item>
@@ -103,6 +114,7 @@
 
 
 import {getTypelist} from "@/config/ApiConfig/articleApiConfig/articleTypeApiConfig";
+import {img2base64File} from "@/config/ApiConfig/fileApiConfig/fileApiConfig";
 
 export default {
   name: "articleAsideBox",
@@ -117,7 +129,39 @@ export default {
     addLabel(){
       let items = this.tempLabel;
       this.articleBody.labelList.push(items)
-    }
+    },
+
+    uploadAvatar(param){
+      var file = param.file;
+      var data=new FormData();
+      data.append("image",file)
+      this.axios.post(img2base64File,data)
+          .then(res=>{
+            console.log(res.data)
+            if(!res.data.code){
+              // globalValue.BASE64HEADER
+              this.articleBody.featImg=res.data.code
+            }
+            else{
+              console.log(res.data.message)
+            }
+          })
+          .catch(err=>{
+            console.log(err.data)
+          })
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = (file.type === 'image/jpeg') || (file.type === 'image/png') || (file.type === 'image/bmp');
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isJPG) {
+        this.$message.error('上传头像只能是 jpg、png、bmp 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      // this.$refs.upload.submit();
+      return isJPG && isLt2M;
+    },
   },
   mounted() {
     this.axios.get(getTypelist)

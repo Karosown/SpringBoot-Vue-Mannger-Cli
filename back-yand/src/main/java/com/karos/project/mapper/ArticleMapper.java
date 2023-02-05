@@ -15,9 +15,9 @@ import java.util.List;
 */
 public interface ArticleMapper extends BaseMapper<Article> {
 
-    @Select("select id,userId,userArticleid,articleUrl,type,labelList,isPublist,viewNum,thumbNum,createTime,upDateTime,hasThumb " +
-            "From article left join articletype")
-    List<ArticleVo> getVos();
+//    @Select("select id,userId,userArticleid,articleUrl,type,labelList,isPublist,viewNum,thumbNum,createTime,upDateTime,hasThumb " +
+//            "From article left join articletype")
+//    List<ArticleVo> getVos();
 }
 
 

@@ -1,11 +1,13 @@
 package com.karos.project.model.entity;
 
+import cn.hutool.json.JSON;
 import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
 /**
@@ -43,12 +45,12 @@ public class Article implements Serializable {
      */
     private String articleIntroduction;
     private int type;
-    private List<String> labelList;
+
+    private String labelList;
     /**
      * 是否公开（0为否，1为公开）
      */
     private Integer isPublic;
-
     /**
      * 浏览量
      */
@@ -72,8 +74,11 @@ public class Article implements Serializable {
     /**
      * 更新时间
      */
-    private Date upDateTime;
-
+    private Date updateTime;
+    /**
+     * 特色图片
+     */
+    private String featImg;
     /**
      * 是否删除（0否，1是）
      */

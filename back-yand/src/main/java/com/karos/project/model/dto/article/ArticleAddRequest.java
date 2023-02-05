@@ -1,5 +1,6 @@
 package com.karos.project.model.dto.article;
 
+import cn.hutool.json.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -35,8 +36,11 @@ public class ArticleAddRequest implements Serializable {
      * 类型
      */
     private int type;
-    private List<String> labelList;
-
+    private String labelList;
+    /**
+     * 文章简介
+     */
+    private String articleIntroduction;
     /**
      * 是否公开（0为否，1为公开）
      */
@@ -46,6 +50,10 @@ public class ArticleAddRequest implements Serializable {
      * 定时发布
      */
     private Date publishTime;
+    /**
+     * 特色图片
+     */
+    private String featImg;
     /**
      * IP地址
      */
