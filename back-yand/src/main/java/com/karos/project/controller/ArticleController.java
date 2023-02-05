@@ -197,12 +197,12 @@ public class ArticleController {
     @PostMapping("/delete")
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "删除文章接口")
-    public BaseResponse<Boolean> deleteArticle(@RequestBody DeleteRequest<String> deleteRequest, HttpServletRequest request) {
-        if (deleteRequest == null || StringUtils.isAnyBlank(deleteRequest.getId())) {
+    public BaseResponse<Boolean> deleteArticle(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+        if (deleteRequest == null || StringUtils.isAnyBlank((String)deleteRequest.getId())) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User user = userService.getLoginUser(request);
-        String id = deleteRequest.getId();
+        String id = (String)deleteRequest.getId();
         // 判断是否存在
         Article oldArticle = articleService.getById(id);
         if (oldArticle == null) {
@@ -315,6 +315,7 @@ public class ArticleController {
             BeanUtils.copyProperties(articleQueryRequest, articleQuery);
         }
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>(articleQuery);
+
         List<Article> articleList = articleService.list(queryWrapper);
         Page<Article> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize(),articleList.size());
         articlePage.setRecords(articleList);

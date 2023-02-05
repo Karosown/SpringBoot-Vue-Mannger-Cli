@@ -35,15 +35,14 @@ import com.karos.project.model.dto.article.ArticleAddRequest;
 import com.karos.project.model.dto.article.ArticleDoThumbRequest;
 import com.karos.project.model.dto.article.ArticleQueryRequest;
 import com.karos.project.model.dto.article.ArticleUpdateRequest;
-import com.karos.project.model.entity.Article;
-import com.karos.project.model.entity.Articlehistory;
-import com.karos.project.model.entity.Articlethumbrecords;
-import com.karos.project.model.entity.User;
+import com.karos.project.model.dto.articletype.ArticleTypeAddRequestBody;
+import com.karos.project.model.entity.*;
 import com.karos.project.model.vo.article.ArticleTypeVo;
 import com.karos.project.model.vo.article.ArticleVo;
 import com.karos.project.service.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.HashOperations;
@@ -82,6 +81,21 @@ public class ArticleTypeController {
         return ResultUtils.success(articleTypeService.allList());
     }
 
+    @PostMapping("/add")
+    public BaseResponse<Boolean> addType(@RequestBody ArticleTypeAddRequestBody articleTypeAddRequestBody){
+        if (ObjectUtils.isEmpty(articleTypeAddRequestBody)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (ObjectUtils.isNotEmpty(articleTypeAddRequestBody.getFId())
+                &&ObjectUtils.isEmpty(articleTypeService.getById(articleTypeAddRequestBody.getFId()))
+                &&articleTypeAddRequestBody.getFId()!=0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        ArticleType articleType=new ArticleType();
+        BeanUtils.copyProperties(articleTypeAddRequestBody,articleType);
+        boolean save = articleTypeService.save(articleType);
+        return ResultUtils.success(save);
+    }
     // endregion
 
 }

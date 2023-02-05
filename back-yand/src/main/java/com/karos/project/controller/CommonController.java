@@ -86,6 +86,6 @@ public class CommonController {
     @GetMapping("/get")
     public BaseResponse<String> getAttribute(@RequestParam("attribute") String attribute){
         Common byId = commonService.getById(attribute);
-        return ResultUtils.success(byId.getValue());
+        return ResultUtils.success(byId!=null?byId.getValue():null);
     }
 }

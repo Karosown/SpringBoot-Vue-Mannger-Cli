@@ -23,7 +23,7 @@ public class ArticleType implements Serializable {
     /**
      * '父类型'
      */
-    private Integer fid;
+    private Integer fId;
 
     /**
      * 类型名

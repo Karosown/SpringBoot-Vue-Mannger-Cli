@@ -246,11 +246,11 @@ public class UserController {
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "删除用户")
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest<Long> deleteRequest, HttpServletRequest request) {
-        if (deleteRequest == null || deleteRequest.getId() <= 0) {
+    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+        if (deleteRequest == null || (Long)deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean b = userService.removeById(deleteRequest.getId());
+        boolean b = userService.removeById((Long)deleteRequest.getId());
         return ResultUtils.success(b);
     }
 

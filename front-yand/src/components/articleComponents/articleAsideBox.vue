@@ -78,13 +78,22 @@
       </e-row>
     </el-collapse-item>
     <el-collapse-item title="特色图片" name="3">
-      <div>简化流程：设计简洁直观的操作流程；</div>
-      <div>清晰明确：语言表达清晰且表意明确，让用户快速理解进而作出决策；</div>
-      <div>帮助用户识别：界面简单直白，让用户快速识别而非回忆，减少用户记忆负担。</div>
+      <el-upload
+          class="upload-demo"
+          drag
+          action="https://jsonplaceholder.typicode.com/posts/"
+          multiple>
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+      </el-upload>
     </el-collapse-item>
-    <el-collapse-item title="可控 Controllability" name="4">
-      <div>用户决策：根据场景可给予用户操作建议或安全提示，但不能代替用户进行决策；</div>
-      <div>结果可控：用户可以自由的进行操作，包括撤销、回退和终止当前操作等。</div>
+    <el-collapse-item title="文章简介" name="4">
+        <el-input type="textarea"
+                  :rows="4"
+                  placeholder="留空则自动填写">
+
+        </el-input>
     </el-collapse-item>
   </el-collapse>
 </template>

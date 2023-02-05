@@ -10,11 +10,11 @@ import java.io.Serializable;
  * @author karos
  */
 @Data
-public class DeleteRequest<T> implements Serializable {
+public class DeleteRequest implements Serializable {
     /**
      * id
      */
-    private T id;
+    private Object id;
 
     private static final long serialVersionUID = 1L;
 }
