@@ -2,8 +2,8 @@
   <el-container >
     <el-header>
       <el-col span="12">
-        <el-button type="info">导出为excel</el-button>
-
+        <el-button type="info" @click="downloadExcel">导出为excel</el-button>
+        <el-button type="danger">回收站</el-button>
       </el-col>
       <el-col span="12">
         <el-col span="12" style="margin-right: 3px">
@@ -12,14 +12,13 @@
         </el-input>
         </el-col>
         <el-button @click="newArticle" type="primary">新增文章</el-button>
-        <el-button type="danger">回收站</el-button>
       </el-col>
     </el-header>
     <el-main>
       <el-table border lazy
           :data="articleDatas"
           style="width: 100%"
-
+                @selection-change="addCheck"
       >
         <el-table-column type="selection" width="39"></el-table-column>
         <el-table-column
@@ -31,12 +30,18 @@
         <el-table-column
             property="articleTitle"
             label="文章标题"
-            width="250">
+            width="230">
         </el-table-column>
         <el-table-column
             property="articleUrl"
             label="OSS地址"
-            width="200">
+            width="210">
+          <template slot-scope="scope">
+            <el-tooltip effect="dark" :content="scope.row.articleUrl" placement="bottom">
+              <el-link >              {{scope.row.articleUrl.substring(0,25)}}...
+              </el-link>
+            </el-tooltip>
+          </template>
         </el-table-column>
         <el-table-column
             property="articleIntroduction"
@@ -96,7 +101,7 @@
       <el-pagination
       @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :current-page="currentPage4"
+                :current-page="currentPage"
           :page-sizes="[10, 20, 30, 40,50]"
           :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
@@ -107,8 +112,9 @@
 </template>
 
 <script>
-import {getArticleslistPage} from "@/config/ApiConfig/articleApiConfig/articleApiConfig";
+import {exportVoExcel, getArticleslistPage} from "@/config/ApiConfig/articleApiConfig/articleApiConfig";
 import {articleQureyRequestBody} from "@/entity/article/AriticleQueryRequestBody";
+import {globalValue} from "@/config/CommonConfig/globalconfig";
 
 export default {
   name: "articlePage",
@@ -116,28 +122,54 @@ export default {
     return{
       total:null,
       articleDatas:null,
-      searchText:null
+      currentPage:1,
+      searchText:null,
+      articleQureyPageBody:new articleQureyRequestBody(),
+      reqBody:{
+        articleVoList:[]
+      }
     }
   },
   methods:{
+    downloadExcel(){
+      this.axios.post(exportVoExcel, this.reqBody,{
+        responseType:"blob"
+      })
+          .then(res=>{
+            globalValue.downloadFn(res.data)
+          })
+    },
+    addCheck(val){
+      this.reqBody.articleVoList=val;
+    },
+    handleCurrentChange(val){
+      this.articleQureyPageBody.current=val
+      this.send()
+
+    },
+    handleSizeChange(val){
+      this.articleQureyPageBody.pageSize=val;
+      this.send()
+    },
     search(){
 
+    },
+    send(){
+      this.axios.get(getArticleslistPage,{
+        params:this.articleQureyPageBody
+      })
+          .then(res=>{
+            this.total=res.data.data.total
+            this.articleDatas=res.data.data.records
+          })
     },
     newArticle(){
       this.$router.push({path:'/articlePublish'});
     }
   },
   mounted() {
-    var articleQureyPageBody = new articleQureyRequestBody()
-    articleQureyPageBody.sortField='createTime'
-    this.axios.get(getArticleslistPage,{
-      params:articleQureyPageBody
-    })
-        .then(res=>{
-          this.total=res.data.data.total
-          this.articleDatas=res.data.data.records
-        })
-
+    this.articleQureyPageBody.sortField='createTime'
+    this.send()
   }
 }
 </script>

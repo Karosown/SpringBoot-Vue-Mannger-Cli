@@ -20,6 +20,9 @@ import cn.hutool.crypto.digest.DigestUtil;
 import cn.katool.Exception.KaToolException;
 import cn.katool.dateutil.expDateUtil;
 import cn.katool.io.ImageUtils;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.metadata.Sheet;
+import com.alibaba.excel.support.ExcelTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
@@ -34,10 +37,8 @@ import com.karos.project.common.ResultUtils;
 import com.karos.project.constant.CommonConstant;
 import com.karos.project.constant.RedisKeysConstant;
 import com.karos.project.exception.BusinessException;
-import com.karos.project.model.dto.article.ArticleAddRequest;
-import com.karos.project.model.dto.article.ArticleDoThumbRequest;
-import com.karos.project.model.dto.article.ArticleQueryRequest;
-import com.karos.project.model.dto.article.ArticleUpdateRequest;
+import com.karos.project.mapper.ArticleMapper;
+import com.karos.project.model.dto.article.*;
 import com.karos.project.model.entity.*;
 import com.karos.project.model.vo.article.ArticleTypeVo;
 import com.karos.project.model.vo.article.ArticleVo;
@@ -51,7 +52,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -72,6 +75,25 @@ public class ArticleController {
     private ArticlethumbrecordsService articlethumbrecordsService;
     @Resource
     LockUtil lockUtil;
+    @AuthCheck(mustRole = "admin")
+    @PostMapping("/exportVoExcel")
+    public void exportExcel(@RequestBody ArticleExportRequest articleExportRequest, HttpServletResponse response) throws IOException {
+        String fileName = String.valueOf(new Date().getTime());
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-disposition", "attachment;filename=" +fileName + ".xls");
+        ServletOutputStream out = response.getOutputStream();
+        ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLS,true);
+        Sheet sheet = new Sheet(1,0,ArticleVo.class);
+        //设置自适应宽度
+        sheet.setAutoWidth(Boolean.TRUE);
+        sheet.setSheetName(fileName);
+        writer.write(articleExportRequest.getArticleVoList(),sheet);
+        writer.finish();
+        out.flush();
+        response.getOutputStream().close();
+        out.close();
+    }
     @AuthCheck(mustRole = "admin")
     @GetMapping("/LockTest")
     public BaseResponse<String> test(@RequestParam("expTime") Long expTime){
@@ -145,7 +167,9 @@ public class ArticleController {
         // 校验
         article.setCreateTime(new Date());
         article.setArticleUrl(articleUrl);
-        article.setArticleIntroduction(articleService.getIntroduction(articleAddRequest));
+        if (StringUtils.isEmpty(article.getArticleIntroduction())){
+            article.setArticleIntroduction(articleService.getIntroduction(articleAddRequest));
+        }
         String featImg = article.getFeatImg();
         if (StringUtils.isNotBlank(featImg)){
             try {
@@ -161,6 +185,29 @@ public class ArticleController {
             articleService.validArticle(article, true);
             User loginUser = userService.getLoginUser(request);
             article.setUserId(loginUser.getId());
+            //设置定时任务
+            Date publishTime = articleAddRequest.getPublishTime();
+            if (ObjectUtil.isNotEmpty(publishTime)){
+                String corn =null;
+                try {
+                    corn=expDateUtil.getCorn(publishTime);
+                } catch (KaToolException e) {
+                    throw new BusinessException(e);
+                }
+                String finalNewArticleId = newArticleId;
+                String id = CronUtil.schedule(corn, new Task() {
+                    @Override
+                    public void execute() {
+                        QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
+                        queryWrapper.eq("id", finalNewArticleId);
+                        Article one = articleService.getOne(queryWrapper);
+                        one.setIsPublic(1);
+                        articleService.updateById(one);
+                        log.info("定时文章ID={}发布添加成功,添加时间{},等待发布时间{}", finalNewArticleId, new Date(), publishTime);
+                    }
+                });
+                article.setSchedId(id);
+            }
             boolean result = articleService.save(article);
             if (!result) {
                 throw new BusinessException(ErrorCode.OPERATION_ERROR);
@@ -173,27 +220,6 @@ public class ArticleController {
             articlehistory.setIp(article.getIP());
             articlehistory.setVersion(1L);
             articlehistory.setUpdateTime(new Date());
-            Date publishTime = articleAddRequest.getPublishTime();
-            if (ObjectUtil.isNotEmpty(publishTime)){
-                String corn =null;
-                try {
-                    corn=expDateUtil.getCorn(publishTime);
-                } catch (KaToolException e) {
-                    throw new BusinessException(e);
-                }
-                String finalNewArticleId = newArticleId;
-                CronUtil.schedule(corn, new Task() {
-                    @Override
-                    public void execute() {
-                        QueryWrapper<Article> queryWrapper=new QueryWrapper<>();
-                        queryWrapper.eq("id", finalNewArticleId);
-                        Article one = articleService.getOne(queryWrapper);
-                        one.setIsPublic(1);
-                        articleService.updateById(one);
-                        log.info("定时文章ID={}发布添加成功,添加时间{},等待发布时间{}",finalNewArticleId,new Date(),publishTime);
-                    }
-                });
-            }
             articlehistoryService.save(articlehistory);
         }
         return ResultUtils.success(newArticleId,"添加成功");
@@ -317,20 +343,16 @@ public class ArticleController {
      * @param articleQueryRequest
      * @return
      */
+    @Resource
+    ArticleMapper articleMapper;
     @AuthCheck(mustRole = "admin")
     @GetMapping("/list")
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "分页获取文章列表 - 管理员")
-    public BaseResponse<Page<Article>> listArticle(ArticleQueryRequest articleQueryRequest) {
-        Article articleQuery = new Article();
-        if (articleQueryRequest != null) {
-            BeanUtils.copyProperties(articleQueryRequest, articleQuery);
-        }
-        QueryWrapper<Article> queryWrapper = new QueryWrapper<>(articleQuery);
-        List<Article> articleList = articleService.list(queryWrapper);
-        Page<Article> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize(),articleList.size());
-        articlePage.setRecords(articleList);
-        return ResultUtils.success(articlePage);
+    public BaseResponse<Page<ArticleVo>> listArticle(ArticleQueryRequest articleQueryRequest) {
+        Page<ArticleVo> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize());
+        Page<ArticleVo> articleVoPage = articleMapper.VoPage(articlePage);
+        return ResultUtils.success(articleVoPage);
     }
 
     @AuthCheck

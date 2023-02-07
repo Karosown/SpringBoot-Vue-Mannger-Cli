@@ -13,7 +13,7 @@
 
 -->
 
-  <el-collapse v-model="activeNames" @change="handleChange">
+  <el-collapse>
     <el-collapse-item title="文章摘要" name="1">
       <el-row>
         <el-col span="8">
@@ -36,7 +36,7 @@
           <el-col span="8">
 
           <el-date-picker
-            v-model="articleBody.publishTime"
+            v-model="publishTime"
             type="datetime"
             placeholder="选择日期时间,留空为不选择">
         </el-date-picker>
@@ -51,7 +51,7 @@
           <el-col span="16">
            <el-cascader
               :options="types"
-              v-model="articleBody.type"
+              v-model="type"
               clearable>
            </el-cascader>
           </el-col>
@@ -120,6 +120,8 @@ export default {
   name: "articleAsideBox",
   data(){
     return{
+      type:[],
+      publishTime:null,
       articleBody:this.$parent.$parent.$parent.$parent.articleAddRequest,
       tempLabel:null,
       types:null
@@ -170,6 +172,14 @@ export default {
             this.types=res.data.data
           }
         })
+  },
+  watch:{
+    type(){
+      this.articleBody.type=this.type[this.type.length-1]
+    },
+    publishTime(){
+      this.articleBody.publishTime=this.publishTime.getTime()
+    }
   }
 }
 </script>

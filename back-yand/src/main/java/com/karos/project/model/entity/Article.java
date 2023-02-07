@@ -75,10 +75,18 @@ public class Article implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
     /**
      * 特色图片
      */
     private String featImg;
+    /**
+     * 定时任务ID
+     */
+    private String schedId;
+    /**
+     * 定时任务ID
+     */
     /**
      * 是否删除（0否，1是）
      */

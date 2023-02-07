@@ -1,6 +1,7 @@
 package com.karos.project;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.cron.CronUtil;
 import com.karos.project.common.InitRedis;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -19,6 +20,12 @@ public class ArticleBookBackYardApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ArticleBookBackYardApplication.class, args);
+        //支持秒级别定时任务
+        CronUtil.setMatchSecond(true);
+        //定时服务启动
+        CronUtil.start();
+        //使用deamon模式
+        //CronUtil.start(true);
     }
 
 }

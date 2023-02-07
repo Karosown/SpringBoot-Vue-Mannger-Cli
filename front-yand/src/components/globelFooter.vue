@@ -24,7 +24,6 @@ export default {
             this.Time=res.data.data
           }
           else {
-
             this.Time=fullYear.toString()
           }
         })
