@@ -3,7 +3,7 @@
     <el-header>
       <el-col span="12">
         <el-button type="info" @click="downloadExcel">导出为excel</el-button>
-        <el-button type="danger" @click="gotoGarbage">回收站</el-button>
+        <el-button type="info" @click="gotoArticleMangger">返回文章管理</el-button>
       </el-col>
       <el-col span="12">
         <el-col span="12" style="margin-right: 3px">
@@ -11,7 +11,6 @@
           <i slot="suffix" class="el-icon-search" @click="search"></i>
         </el-input>
         </el-col>
-        <el-button @click="newArticle" type="primary">新增文章</el-button>
       </el-col>
     </el-header>
     <el-main>
@@ -86,11 +85,7 @@
           <template slot-scope="scope">
             <el-button type="primary"
                 size="mini"
-                @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.row)">删除</el-button>
+                @click="handleFind(scope.row)">找回</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -112,13 +107,15 @@
 </template>
 
 <script>
-import {deleteArticle, exportVoExcel, getArticleslistPage} from "@/config/ApiConfig/articleApiConfig/articleApiConfig";
+import {
+  exportVoExcel, getArticlesGarbagePage, recoveryArticle,
+} from "@/config/ApiConfig/articleApiConfig/articleApiConfig";
 import {articleQureyRequestBody} from "@/entity/article/AriticleQueryRequestBody";
 import {globalValue} from "@/config/CommonConfig/globalconfig";
-import {DeleteRequestBody} from "@/entity/common/deleteRequestBody";
+import {RecoveryRequestBody} from "@/entity/common/recoveryRequestBody";
 
 export default {
-  name: "articlePage",
+  name: "articleGarbagePage",
   data(){
     return{
       total:null,
@@ -132,24 +129,8 @@ export default {
     }
   },
   methods:{
-    gotoGarbage(){
-      this.$router.push('/articleGarbagePage')
-    },
-    handleDelete(data){
-      var deleteRequestBody = new DeleteRequestBody();
-      deleteRequestBody.id=data.id
-      this.axios.post(deleteArticle,deleteRequestBody)
-          .then(res=>{
-            if (!res.data.code){
-              this.$message.success(res.data.message)
-              this.articleDatas.splice(this.articleDatas.indexOf(data),1)
-            }
-          })
-    },
-    handleEdit(data){
-      this.$router.push({path:'/articleUpdate',query:{
-        id:data.id
-        }})
+    gotoArticleMangger(){
+      this.$router.push('/articlePage')
     },
     downloadExcel(){
       this.axios.post(exportVoExcel, this.reqBody,{
@@ -165,7 +146,6 @@ export default {
     handleCurrentChange(val){
       this.articleQureyPageBody.current=val
       this.send()
-
     },
     handleSizeChange(val){
       this.articleQureyPageBody.pageSize=val;
@@ -175,7 +155,7 @@ export default {
 
     },
     send(){
-      this.axios.get(getArticleslistPage,{
+      this.axios.get(getArticlesGarbagePage,{
         params:this.articleQureyPageBody
       })
           .then(res=>{
@@ -183,8 +163,19 @@ export default {
             this.articleDatas=res.data.data.records
           })
     },
-    newArticle(){
-      this.$router.push({path:'/articlePublish'});
+    handleFind(data){
+      var recoveryRequestBody = new RecoveryRequestBody();
+      recoveryRequestBody.id=data.id
+      this.axios.post(recoveryArticle,recoveryRequestBody)
+          .then(res=>{
+            if (!res.data.code){
+              this.$message.success(res.data.message)
+              this.articleDatas.splice(this.articleDatas.indexOf(data),1)
+            }
+            else{
+              this.$message.error(res.data.message)
+            }
+          })
     }
   },
   mounted() {

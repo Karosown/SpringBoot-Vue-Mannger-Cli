@@ -16,7 +16,7 @@ import cn.hutool.cron.CronUtil;
 import cn.hutool.cron.task.Task;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.katool.Exception.KaToolException;
-import cn.katool.dateutil.expDateUtil;
+import cn.katool.util.expDateUtil;
 import cn.katool.iputils.IpUtils;
 import cn.katool.lock.LockUtil;
 import cn.katool.qiniu.impl.QiniuServiceImpl;

@@ -10,6 +10,7 @@ const checkCodeSend = "/checkcode/send";
 const userRegister=base+"/register";
 //通过id获取用户信息 GET
 const getUserById=base+"/get?id=";
+const getUserAccountbyID=base+"/get/userAccount?id=";
 //获取用户昵称
 const getUserNamebyID=base+"/get/userName?id=";
 //获取用户头像api get
@@ -17,6 +18,7 @@ const getUserAvatarByUserAccount=base+"/get/userAvatar?useraccount=";
 const getUserAvatarById=base+"/get/userAvatar?id=";
 
 export {
+    getUserAccountbyID,
     checkCodeSend,
     userUpdatePassword,
     userUpdateMessage,

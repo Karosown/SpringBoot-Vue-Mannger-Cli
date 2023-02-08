@@ -34,11 +34,10 @@
          <span class="text-title">定时发布</span>
         </el-col>
           <el-col span="8">
-
           <el-date-picker
             v-model="publishTime"
             type="datetime"
-            placeholder="选择日期时间,留空为不选择">
+            placeholder="留空为直接存为不启用定时发布">
         </el-date-picker>
           </el-col>
       </el-row>
@@ -50,6 +49,7 @@
           </el-col>
           <el-col span="16">
            <el-cascader
+              placeholder="未分类"
               :options="types"
               v-model="type"
               clearable>
@@ -94,8 +94,10 @@
           drag>
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-        <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+        <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过2MB</div>
       </el-upload>
+      <img style="height: 400px;witdh:400px" :src="articleBody.featImg||base64h+articleBody.featImg" v-if="articleBody.featImg"/>
+      <img style="height: 100px;witdh:100px;background-color: #797979;" v-else>
     </el-collapse-item>
     <el-collapse-item title="文章简介" name="4">
         <el-input type="textarea"
@@ -103,7 +105,6 @@
                   placeholder="留空则自动填写"
                 v-model="articleBody.articleIntroduction"
         >
-
         </el-input>
     </el-collapse-item>
   </el-collapse>
@@ -115,16 +116,18 @@
 
 import {getTypelist} from "@/config/ApiConfig/articleApiConfig/articleTypeApiConfig";
 import {img2base64File} from "@/config/ApiConfig/fileApiConfig/fileApiConfig";
+import {globalValue} from "@/config/CommonConfig/globalconfig";
 
 export default {
   name: "articleAsideBox",
   data(){
     return{
       type:[],
-      publishTime:null,
-      articleBody:this.$parent.$parent.$parent.$parent.articleAddRequest,
+      articleBody:this.$parent.$parent.$parent.$parent.articleAddRequest||this.$parent.$parent.$parent.$parent.articleUpdateRequest,
+      publishTime: null,
       tempLabel:null,
-      types:null
+      types:null,
+      base64h:globalValue.BASE64HEADER
     }
   },
   methods:{
@@ -142,7 +145,7 @@ export default {
             console.log(res.data)
             if(!res.data.code){
               // globalValue.BASE64HEADER
-              this.articleBody.featImg=res.data.code
+              this.articleBody.featImg=res.data.data
             }
             else{
               console.log(res.data.message)
@@ -166,10 +169,11 @@ export default {
     },
   },
   mounted() {
+    this.publishTime=this.$parent.$parent.$parent.$parent.articleVo.publishTime
     this.axios.get(getTypelist)
-        .then(res=>{
-          if (!res.data.code){
-            this.types=res.data.data
+        .then(res => {
+          if (!res.data.code) {
+            this.types = res.data.data
           }
         })
   },

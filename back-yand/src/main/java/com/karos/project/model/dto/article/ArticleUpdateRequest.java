@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,10 +29,13 @@ public class ArticleUpdateRequest implements Serializable {
      * 用户文章ID
      */
     private Long userArticleid;
+    private Date publishTime;
     /**
      * 文章标题
      */
     private String articleTitle;
+    private String articleIntroduction;
+
     /**
      * 文章内容
      */
@@ -47,5 +51,9 @@ public class ArticleUpdateRequest implements Serializable {
      * 特色图片
      */
     private String featImg;
+    /**
+     * 定时任务ID
+     */
+    private String schedId;
     private static final long serialVersionUID = 1L;
 }

@@ -14,4 +14,5 @@ public interface RedisKeysConstant {
     String ThumbsHistoryHash="thumbsOfArticle";
     String ThumbsUserSet="thumbsUserIds";
     String  ThumbsNum="thumbsNumOfArticle";
+    String SchedDate="SchedDate";
 }

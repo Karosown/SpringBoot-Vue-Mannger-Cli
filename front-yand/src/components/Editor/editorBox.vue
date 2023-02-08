@@ -25,6 +25,9 @@ import markdownModule from '@wangeditor/plugin-md'
 
 Boot.registerModule(markdownModule)
 export default {
+  props:{
+    url:null
+  },
   name: "editorBox",
   components: { Editor, Toolbar },
   data() {
@@ -43,10 +46,17 @@ export default {
     }
   },
   mounted() {
+    if (this.url != null) {
+      this.reqbody = this.$parent.$parent.$parent.$parent.articleUpdateRequest
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET',this.url,false);
+      xhr.send(null);
+      this.reqbody.articleText=xhr.responseText
+    }
     // 模拟 ajax 请求，异步渲染编辑器
-    setTimeout(() => {
-
-    })
+    // setTimeout(() => {
+    //
+    // })
   },
   beforeDestroy() {
     const editor = this.editor

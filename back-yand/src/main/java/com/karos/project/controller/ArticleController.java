@@ -15,11 +15,13 @@ import java.util.*;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.cron.CronUtil;
+import cn.hutool.cron.pattern.CronPattern;
 import cn.hutool.cron.task.Task;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.katool.Exception.KaToolException;
-import cn.katool.dateutil.expDateUtil;
+import cn.katool.util.expDateUtil;
 import cn.katool.io.ImageUtils;
+import cn.katool.util.expBase64Util;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.excel.support.ExcelTypeEnum;
@@ -30,21 +32,20 @@ import cn.katool.iputils.IpUtils;
 import cn.katool.lock.LockUtil;
 import cn.katool.qiniu.impl.QiniuServiceImpl;
 import com.karos.project.annotation.AuthCheck;
-import com.karos.project.common.BaseResponse;
-import com.karos.project.common.DeleteRequest;
-import com.karos.project.common.ErrorCode;
-import com.karos.project.common.ResultUtils;
+import com.karos.project.common.*;
 import com.karos.project.constant.CommonConstant;
 import com.karos.project.constant.RedisKeysConstant;
 import com.karos.project.exception.BusinessException;
 import com.karos.project.mapper.ArticleMapper;
 import com.karos.project.model.dto.article.*;
+import com.karos.project.model.dto.articlehistory.ArticleHistoryQueryRequest;
 import com.karos.project.model.entity.*;
-import com.karos.project.model.vo.article.ArticleTypeVo;
+import com.karos.project.model.vo.article.ArticleHistoryVo;
 import com.karos.project.model.vo.article.ArticleVo;
 import com.karos.project.service.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.HashOperations;
@@ -75,6 +76,23 @@ public class ArticleController {
     private ArticlethumbrecordsService articlethumbrecordsService;
     @Resource
     LockUtil lockUtil;
+    @GetMapping("/get/userAccount")
+    public BaseResponse<String> getUserAccount(@RequestParam(value = "id",required = false) Long id,
+                                               HttpServletResponse httpServletResponse){
+        if (ObjectUtils.anyNull(id)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        HashOperations hashOperations = redisTemplate.opsForHash();
+        String userAccount=null;
+        hashOperations.get("UserAccountdb",id.toString());
+        if (userAccount==null) {
+            synchronized ("Lock".intern()){
+                userAccount = userService.getUserAccount(id);
+            }
+            if (ObjectUtils.isNotEmpty(id))hashOperations.put("UserAccountdb",id.toString(),userAccount);
+        }
+        return ResultUtils.success(userAccount);
+    }
     @AuthCheck(mustRole = "admin")
     @PostMapping("/exportVoExcel")
     public void exportExcel(@RequestBody ArticleExportRequest articleExportRequest, HttpServletResponse response) throws IOException {
@@ -174,7 +192,7 @@ public class ArticleController {
         if (StringUtils.isNotBlank(featImg)){
             try {
                 File file = ImageUtils.base642img(featImg);
-                String s = qnsi.uploadFile(file, "/articleFeatIamg", article.getArticleTitle(), ".png", true);
+                String s = qnsi.uploadFile(file, "/articleFeatIamg", article.getId(), ".png", true);
                 article.setFeatImg(s);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -207,6 +225,7 @@ public class ArticleController {
                     }
                 });
                 article.setSchedId(id);
+                redisTemplate.opsForHash().put(RedisKeysConstant.SchedDate,id,publishTime);
             }
             boolean result = articleService.save(article);
             if (!result) {
@@ -252,7 +271,7 @@ public class ArticleController {
         }
         //逻辑上删除
         boolean b = articleService.removeById(id);
-        return ResultUtils.success(b);
+        return ResultUtils.success(b,"删除成功");
     }
 
     /**
@@ -277,8 +296,11 @@ public class ArticleController {
         articleService.validArticle(article, false);
         User user = userService.getLoginUser(request);
         String id = articleUpdateRequest.getId();
+        String featImg = article.getFeatImg();
+        String schedId = article.getSchedId();
         // 判断是否存在
         Article oldArticle = articleService.getById(id);
+        String oldarticleUrl = oldArticle.getArticleUrl();
         if (oldArticle == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
@@ -286,7 +308,6 @@ public class ArticleController {
         if (!oldArticle.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
-        String oldarticleUrl = oldArticle.getArticleUrl();
         String originName = qnsi.getOriginName(oldarticleUrl);
         String articleUrl=null;
         try {
@@ -301,7 +322,54 @@ public class ArticleController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-//        todo
+        if (StringUtils.isNotBlank(featImg)&&expBase64Util.isBase64(featImg)){
+            try {
+                File file = ImageUtils.base642img(featImg);
+                String s = qnsi.uploadFile(file, "/articleFeatIamg", article.getId(), ".png", true);
+                article.setFeatImg(s);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Date publishTime = articleUpdateRequest.getPublishTime();
+        if (ObjectUtil.isNotEmpty(publishTime)&&!redisTemplate.opsForHash().get(RedisKeysConstant.SchedDate,schedId).equals(publishTime)) {
+            try {
+                if (StringUtils.isNotBlank(schedId)){
+                    CronUtil.updatePattern(schedId, CronPattern.of(expDateUtil.getCorn(publishTime)));
+                    redisTemplate.opsForHash().put(RedisKeysConstant.SchedDate,schedId,publishTime);
+                }
+                else{
+                    String corn =null;
+                    try {
+                        corn=expDateUtil.getCorn(publishTime);
+                    } catch (KaToolException e) {
+                        throw new BusinessException(e);
+                    }
+                    String finalNewArticleId = article.getId();
+                    String SchedId = CronUtil.schedule(corn, new Task() {
+                        @Override
+                        public void execute() {
+                            QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
+                            queryWrapper.eq("id", finalNewArticleId);
+                            Article one = articleService.getOne(queryWrapper);
+                            one.setIsPublic(1);
+                            articleService.updateById(one);
+                            log.info("定时文章ID={}发布添加成功,添加时间{},等待发布时间{}", finalNewArticleId, new Date(), publishTime);
+                        }
+                    });
+                    article.setSchedId(SchedId);
+                    redisTemplate.opsForHash().put(RedisKeysConstant.SchedDate,SchedId,publishTime);
+                }
+            } catch (KaToolException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if(ObjectUtil.isEmpty(publishTime)){
+            if (ObjectUtil.isNotEmpty(schedId)){
+                CronUtil.remove(schedId);
+                redisTemplate.opsForHash().delete(RedisKeysConstant.SchedDate,schedId);
+            }
+        }
         article.setArticleUrl(articleUrl);
         article.setArticleIntroduction(articleService.getIntroduction(articleUpdateRequest));
         Articlehistory articlehistory = new Articlehistory();
@@ -315,7 +383,7 @@ public class ArticleController {
         article.setUserId(null);
         boolean result = articleService.updateById(article)&&articlehistoryService.save(articlehistory);
         log.info("用户{} 身份{} 修改帖子ID{}-{}",user.getUserAccount(),user.getUserRole(),article.getId(),article.getArticleTitle());
-        return ResultUtils.success(result);
+        return ResultUtils.success(result,"修改成功");
     }
 
     /**
@@ -334,7 +402,9 @@ public class ArticleController {
         Article article = articleService.getById(id);
         ArticleVo articleVo = new ArticleVo();
         BeanUtils.copyProperties(article, articleVo);
-        return ResultUtils.success(articleVo);
+        Date publishTime = (Date) redisTemplate.opsForHash().get(RedisKeysConstant.SchedDate, articleVo.getSchedId());
+        articleVo.setPublishTime(publishTime);
+        return ResultUtils.success(articleVo,"获取成功");
     }
 
     /**
@@ -352,7 +422,7 @@ public class ArticleController {
     public BaseResponse<Page<ArticleVo>> listArticle(ArticleQueryRequest articleQueryRequest) {
         Page<ArticleVo> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize());
         Page<ArticleVo> articleVoPage = articleMapper.VoPage(articlePage);
-        return ResultUtils.success(articleVoPage);
+        return ResultUtils.success(articleVoPage,"获取成功");
     }
 
     @AuthCheck
@@ -407,7 +477,7 @@ public class ArticleController {
                     v.setThumbNum(Long.valueOf((Integer)hashOperations.get(RedisKeysConstant.ThumbsNum,v.getId())));
                 return v;
             });
-        return ResultUtils.success(voList);
+        return ResultUtils.success(voList,"获取成功");
     }
     /**
      * 分页获取列表
@@ -474,9 +544,55 @@ public class ArticleController {
                 v.setThumbNum(Long.valueOf((Integer)hashOperations.get(RedisKeysConstant.ThumbsNum,v.getId())));
             return v;
         });
-        return ResultUtils.success(articleVoPage);
+        return ResultUtils.success(articleVoPage,"获取成功");
     }
 
+    @AuthCheck
+    @GetMapping("/list/garbage")
+    public BaseResponse<Page<ArticleVo>> getGarbage(ArticleQueryRequest articleQueryRequest){
+        Page<ArticleVo> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize());
+        Page<ArticleVo> articleVoPage = articleMapper.GarbageVoPage(articlePage);
+        return ResultUtils.success(articleVoPage,"获取成功");
+    }
+    @AuthCheck
+    @GetMapping("/getHistory")
+    public BaseResponse<Page<ArticleHistoryVo>> getUpdateHistory(ArticleHistoryQueryRequest ArticleHistoryQueryRequest, HttpServletRequest request){
+        String id = ArticleHistoryQueryRequest.getId();   //日记ID
+        //鉴权
+        //获得所属用户ID
+        Article oldArticle = articleService.getById(id);
+        Long ArticleUserId= oldArticle.getUserId();
+        //获得用户
+        User loginUser = userService.getLoginUser(request);
+        //只有自己和管理员可以获取
+        if (!ArticleUserId.equals(loginUser)&&!userService.isAdmin(request)){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        QueryWrapper<Articlehistory> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq("id",id)
+                .orderByDesc("updateTime");
+        List<Articlehistory> list = articlehistoryService.list(queryWrapper);
+        Page<Articlehistory> ArticlehistoryPage=new Page<>();
+        ArticlehistoryPage.setRecords(list);
+        Page<ArticleHistoryVo> ArticleHistoryVoPage= (Page<ArticleHistoryVo>) ArticlehistoryPage.convert(dao->{
+            ArticleHistoryVo vo=new ArticleHistoryVo();
+            BeanUtils.copyProperties(dao,vo);
+            return vo;
+        });
+        return ResultUtils.success(ArticleHistoryVoPage,"获取成功");
+    }
+
+    @AuthCheck
+    @PostMapping("/recovery")
+    BaseResponse<Boolean> recovery(@RequestBody RecoveryRequest recoveryRequest){
+        String id = (String) recoveryRequest.getId();
+        Article article = articleMapper.ingoreGetOneByID(id);
+        if (ObjectUtils.isEmpty(article)||article.getIsDelete()!=1){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"请求数据不存在或没有被删除");
+        }
+        boolean b = articleMapper.recoveryById(id);
+        return ResultUtils.success(b,"恢复成功");
+    }
     // endregion
 
 }

@@ -52,6 +52,8 @@ public class ArticleVo  extends BaseRowModel implements Serializable {
     private String articleIntroduction;
     @ExcelProperty(value = "文章类型",index = 6)
     private String type;
+    @ExcelProperty(value = "文章类型Id",index = 6)
+    private Integer typeId;
     @ExcelProperty(value = "文章标签",index = 7)
     private String labelList;
 
@@ -86,6 +88,7 @@ public class ArticleVo  extends BaseRowModel implements Serializable {
     @ExcelProperty(value = "最后一次修改时间",index = 12)
     private Date updateTime;
 
+    private Date publishTime;
     /**
      * 是否已点赞
      */
@@ -95,5 +98,9 @@ public class ArticleVo  extends BaseRowModel implements Serializable {
      */
     @ExcelProperty(value = "特色图片地址",index = 13)
     private String featImg;
+    /**
+     * 定时任务ID
+     */
+    private String schedId;
     private static final long serialVersionUID = 1L;
 }

@@ -5,6 +5,7 @@ const doThumbArticle  =base+"/thumb"
 const deleteArticle    =base+"/delete"
 //更新日记API post
 const updateArticles   =base+"/update"
+const getArticleHistory = base+"/getHistory?id=";
 const getArticleByid=base+"/get?id="
 const getArticleslistByFavorite=base+"/list/myfavorite"
 const getArticleslistPage=base+"/list"
@@ -13,7 +14,15 @@ const getArticleslistByArticleTitle=base+"/list/common?sortField=createTime&arti
 const getArticleslistByuserid=base+"/list/common?sortField=createTime&userId=";
 //新增日记api post
 const addArticles=base+"/add"
+//导出excel
+const exportVoExcel=base+"/exportVoExcel";
+const getArticlesGarbagePage=base+"/list/garbage";
+const recoveryArticle=base+"/recovery"
 export {
+    recoveryArticle,
+    getArticlesGarbagePage,
+    getArticleHistory,
+    exportVoExcel,
     doThumbArticle,
     deleteArticle,
     getArticleslistByFavorite,

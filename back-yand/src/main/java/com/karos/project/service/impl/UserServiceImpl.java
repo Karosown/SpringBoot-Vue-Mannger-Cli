@@ -53,6 +53,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private static final String SALT = "karos";
 
     @Override
+    public String getUserAccount(Long id) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        if (ObjectUtils.isNotEmpty(id))queryWrapper.eq("id",id);
+        User user = userMapper.selectOne(queryWrapper);
+        return user.getUserAccount();
+    }
+
+    @Override
     public Boolean reduceOnlineUserNum(HttpServletRequest request) {
         request.getSession().getServletContext().setAttribute(USER_ONLINE_NUM,getOnlineUserNum(request)-1);
         return true;

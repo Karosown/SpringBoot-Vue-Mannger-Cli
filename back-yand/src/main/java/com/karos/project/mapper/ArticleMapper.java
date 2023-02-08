@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.karos.project.model.entity.Article;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.karos.project.model.vo.article.ArticleVo;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -21,14 +23,24 @@ public interface ArticleMapper extends BaseMapper<Article> {
 //    List<ArticleVo> getVos();
 
     @Select("select " +
-            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg\n" +
+            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
             "from article left join articletype on article.type=articletype.id where isDelete = 0")
     List<ArticleVo> VoList();
 
     @Select("select " +
-            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg\n" +
+            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
             "from article left join articletype on article.type=articletype.id where isDelete = 0")
     Page<ArticleVo> VoPage(Page<ArticleVo> articleVoPage);
+
+    @Select("select " +
+            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
+            "from article left join articletype on article.type=articletype.id where isDelete = 1")
+    Page<ArticleVo> GarbageVoPage(Page<ArticleVo> articleVoPage);
+
+    @Select("select * from article where id=#{id}")
+    Article ingoreGetOneByID(@Param("id") String id);
+    @Update("update article set isDelete=0 where id = #{id}")
+    boolean recoveryById(@Param("id") String id);
 }
 
 
