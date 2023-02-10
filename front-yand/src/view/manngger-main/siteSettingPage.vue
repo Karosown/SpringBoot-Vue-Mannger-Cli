@@ -12,7 +12,7 @@
      <el-checkbox-group v-model="checklist">
        <el-row v-for="(item) in form.commonList" :key="item.attribute" style="margin-bottom: 10px">
        <el-col span="3">
-         <el-checkbox  size="medium" style="float: left;"  :label="item.attribute" >
+         <el-checkbox  size="medium" style="float: left;"  :label="item.attribute">
            {{item.attribute}}
          </el-checkbox>
        </el-col>
@@ -32,7 +32,7 @@
      <el-form-item>
        <el-button type="primary" @click="save" :disabled="disabled">保存</el-button>
        <el-button type="primary" @click="addbox=true">新增一项</el-button>
-       <el-button type="primary" @click="removebox=true">删除</el-button>
+       <el-button type="danger" @click="dodel">删除</el-button>
      </el-form-item>
    </el-form>
    <el-dialog
@@ -78,9 +78,9 @@
 <script>
 
 
-import {getCommonList, saveCommon} from "@/config/ApiConfig/commonApiConfig/commonApiConfig";
+import {deletCommon, getCommonList, saveCommon} from "@/config/ApiConfig/commonApiConfig/commonApiConfig";
 import {siteNavUpload} from "@/config/ApiConfig/fileApiConfig/fileApiConfig";
-
+import {DeleteRequestBody} from "@/entity/common/deleteRequestBody"
 
 export default {
   name: "siteSettingPage",
@@ -88,11 +88,13 @@ export default {
     return{
       checkAll:false,
       isIndeterminate:false,
-      //存放已经
-      checklist:[],
+      checklist:[], //被勾选了的
       form:{
         commonList:[]
       },
+      // index:'',
+      //  msg:"",//记录每一条的信息，便于取attribute
+      //  DeleteRequsetBody:[],//存放删除的数据
       disabled:false,
       newCommon:{
         attribute:null,
@@ -104,9 +106,16 @@ export default {
     }
   },
   methods:{
-
-
-    handleCheckAllChange(val){
+    dodel(){
+        for(var i=0;i<this.checklist.length;i++){
+          for(var j=0;j<this.form.commonList.length;j++){
+            if(this.checklist[i]==this.form.commonList[j].attribute){
+              this.form.commonList.splice(j,1);
+            }
+          }
+        }
+    },
+        handleCheckAllChange(val){
       if (val){
         this.checklist=[]
         for(var i=0;i<this.form.commonList.length;i++){
@@ -119,10 +128,12 @@ export default {
         this.checkAll=this.isIndeterminate=false
       }
     },
-
-
-
-
+// handleDelete(index, row) {
+//        this.index = index;
+//        this.msg=row;//每一条数据的记录
+//       this.DeleteRequsetBody.push(this.msg.attribute);//把单行删除的每条数据的id添加进放删除数据的数组
+//       this.axios.get()
+// },
     submit($event,item){
       var file=$event.target.files[0]
       if (file.size>1024*1024*320){
@@ -166,6 +177,15 @@ export default {
               )
             }
           })
+                var A=new DeleteRequestBody
+      A.id=this.checklist
+      this.axios.post(deletCommon,A)
+      .then(res=>{
+        if(!res.data.code){
+          this.$message.success(res.data.message)
+      
+        }
+      })
     }
   },
   mounted() {

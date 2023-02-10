@@ -10,6 +10,17 @@
                :filter-node-method="filterNode"
                default-expand-all
                ref="tree"></el-tree>
+
+    ——————文章分类添加
+              <el-col span="16">
+           <el-cascader
+           v-model="selectV"
+           :props="{ checkStrictly: true }"
+              :options="typelist"
+              clearable></el-cascader>
+          </el-col>
+    <el-input v-model="input" placeholder="请输入内容"></el-input>
+    <el-button @click="add"></el-button>
     </el-main>
   </el-container>
 </template>
@@ -23,13 +34,18 @@ export default {
   data(){
     return{
       typelist:null,
-      filterText:null
+      filterText:null,
+      input:null,
+      selectV:null
     }
   },
   methods:{
     filterNode(value, data) {
       if (!value) return true;
       return data.label.indexOf(value) !== -1;
+    },
+    add(){
+
     }
   },
   watch: {
@@ -44,6 +60,7 @@ export default {
             this.typelist=res.data.data
           }
         })
+    
   }
 }
 </script>

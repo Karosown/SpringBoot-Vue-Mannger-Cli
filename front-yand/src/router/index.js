@@ -8,6 +8,7 @@ import apiDoc from "@/view/manngger-main/apiDoc";
 import classPage from "@/view/manngger-main/classPage";
 import articlePage from "@/view/manngger-main/articlePage";
 import ariticlePublishPage from "@/view/article-main/ariticlePublishPage";
+import userAdmin from '@/view/user-admin/userAdmin';
 import articleTypePage from "@/view/articletype-admin/articleTypePage";  //引入vue-router
 
 Vue.use(VueRouter)  //Vue全局使用Router
@@ -45,6 +46,14 @@ const router = new VueRouter({
                 mustLogin:true
             },
             children:[
+                {
+                    path:'/userAdminPage',
+                    component:userAdmin,
+                    meta:{
+                        title:globalValue.protectTitle()+'用户管理',
+                        mustLogin:true
+                    }
+                },
                 {
                     path:'/settingPage',
                     component:siteSettingPage,

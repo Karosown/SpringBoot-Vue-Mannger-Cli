@@ -127,7 +127,7 @@ export default {
     this.axios.get(getArticleslistPage,{
       params:articleQureyPageBody
     })
-        .then(res=>{
+        .then(res=>{ 
           this.total=res.data.data.total
           this.articleDatas=res.data.data.records
         })

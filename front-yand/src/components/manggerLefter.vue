@@ -13,7 +13,7 @@
         <i class="el-icon-chat-square"></i>
         <span slot="title">分类管理</span>
       </el-menu-item>
-      <el-menu-item index="2"  disabled>
+      <el-menu-item index="/userAdminPage"  >
         <i class="el-icon-user"></i>
         <span slot="title">用户管理</span>
       </el-menu-item>
