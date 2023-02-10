@@ -36,6 +36,5 @@
 		<foreach collection="ids" item="item" index="index" separator=",">
 			#{item}
 		</foreach>)
-
 	</update>
 </mapper>
