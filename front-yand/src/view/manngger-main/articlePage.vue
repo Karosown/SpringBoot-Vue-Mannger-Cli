@@ -3,7 +3,8 @@
     <el-header>
       <el-col span="12">
         <el-button type="info" @click="downloadExcel">导出为excel</el-button>
-        <el-button type="danger" @click="gotoGarbage">回收站</el-button>
+        <el-button type="danger" @click="deleteByList">批量删除</el-button>
+        <el-button type="primary" @click="gotoGarbage">回收站</el-button>
       </el-col>
       <el-col span="12">
         <el-col span="12" style="margin-right: 3px">
@@ -16,7 +17,8 @@
     </el-header>
     <el-main>
       <el-table border lazy
-          :data="articleDatas"
+                ref="multipleTable"
+                :data="articleDatas"
           style="width: 100%"
                 @selection-change="addCheck"
       >
@@ -132,6 +134,32 @@ export default {
     }
   },
   methods:{
+    toggleSelection(rows) {
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+      }
+    },
+    deleteByList(){
+      var deleteRequestBody = new DeleteRequestBody();
+      deleteRequestBody.ids=this.reqBody.articleVoList.map(item=>{
+        return item.id;
+      });
+      this.axios.post(deleteArticle,deleteRequestBody)
+          .then(res=>{
+            if (!res.data.code){
+              for (const k in this.reqBody.articleVoList) {
+                this.articleDatas.splice(this.articleDatas.indexOf(k),1)
+              }
+              this.toggleSelection()
+              this.$message.success(res.data.message)
+            }
+            else this.$message.error(res.data.message)
+          })
+    },
     gotoGarbage(){
       this.$router.push('/articleGarbagePage')
     },
@@ -144,6 +172,7 @@ export default {
               this.$message.success(res.data.message)
               this.articleDatas.splice(this.articleDatas.indexOf(data),1)
             }
+            else this.$message.error(res.data.message)
           })
     },
     handleEdit(data){

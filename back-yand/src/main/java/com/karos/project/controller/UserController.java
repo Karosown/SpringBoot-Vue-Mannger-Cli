@@ -12,10 +12,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import cn.katool.io.ImageUtils;
 import com.karos.project.annotation.AllLimitCheck;
-import com.karos.project.common.BaseResponse;
-import com.karos.project.common.DeleteRequest;
-import com.karos.project.common.ErrorCode;
-import com.karos.project.common.ResultUtils;
+import com.karos.project.common.*;
 import com.karos.project.exception.BusinessException;
 import com.karos.project.model.dto.*;
 import com.karos.project.model.dto.user.*;
@@ -131,7 +128,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/register")
-    @AllLimitCheck(mustText = "用户注册")
+    @AllLimitCheck(mustText = "用户注册",type = LimitTypeCommon.FileUPloadLimit)
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "用户注册")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
@@ -247,10 +244,10 @@ public class UserController {
     @ApiOperation(value = "删除用户")
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
-        if (deleteRequest == null || (Long)deleteRequest.getId() <= 0) {
+        if (deleteRequest == null || Long.parseLong(deleteRequest.getId()) <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean b = userService.removeById((Long)deleteRequest.getId());
+        boolean b = userService.removeById(Long.parseLong(deleteRequest.getId()));
         return ResultUtils.success(b);
     }
 
@@ -262,7 +259,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/update")
-    @AllLimitCheck(mustText = "用户信息更新")
+    @AllLimitCheck(mustText = "用户信息更新",type = LimitTypeCommon.FileUPloadLimit)
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "用户信息修改")
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
@@ -301,7 +298,7 @@ public class UserController {
         return ResultUtils.success(result);
     }
     @PostMapping("/update/resetpassword")
-    @AllLimitCheck(mustText = "用户密码更新")
+    @AllLimitCheck(mustText = "用户密码更新",type = LimitTypeCommon.FileUPloadLimit)
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "用户密码修改")
     public BaseResponse<Boolean> updateUserPassword(@RequestBody UserUpdatePasswordRequest userUpdatePasswordRequest, HttpServletRequest request) {
@@ -335,7 +332,7 @@ public class UserController {
 
 
     @PostMapping("/update/resetmail")
-    @AllLimitCheck(mustText = "用户邮箱更新")
+    @AllLimitCheck(mustText = "用户邮箱更新",type = LimitTypeCommon.FileUPloadLimit)
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "用户邮箱修改")
     public BaseResponse<Boolean> updateUserMail(@RequestBody UserUpdateMailRequest userUpdateMailRequest, HttpServletRequest request) {

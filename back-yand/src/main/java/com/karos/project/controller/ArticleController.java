@@ -12,6 +12,7 @@ package com.karos.project.controller;
 import java.io.*;
 import java.util.*;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.cron.CronUtil;
@@ -31,6 +32,7 @@ import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import cn.katool.iputils.IpUtils;
 import cn.katool.lock.LockUtil;
 import cn.katool.qiniu.impl.QiniuServiceImpl;
+import com.karos.project.annotation.AllLimitCheck;
 import com.karos.project.annotation.AuthCheck;
 import com.karos.project.common.*;
 import com.karos.project.constant.CommonConstant;
@@ -48,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.connection.ConnectionUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -245,36 +248,6 @@ public class ArticleController {
     }
 
     /**
-     * 删除
-     *
-     * @param deleteRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/delete")
-    @ApiOperationSupport(author = "Karos")
-    @ApiOperation(value = "删除文章接口")
-    public BaseResponse<Boolean> deleteArticle(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
-        if (deleteRequest == null || StringUtils.isAnyBlank((String)deleteRequest.getId())) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        User user = userService.getLoginUser(request);
-        String id = (String)deleteRequest.getId();
-        // 判断是否存在
-        Article oldArticle = articleService.getById(id);
-        if (oldArticle == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
-        }
-        // 仅本人或管理员可删除
-        if (!oldArticle.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        //逻辑上删除
-        boolean b = articleService.removeById(id);
-        return ResultUtils.success(b,"删除成功");
-    }
-
-    /**
      * 更新
      *
      * @param articleUpdateRequest
@@ -415,14 +388,24 @@ public class ArticleController {
      */
     @Resource
     ArticleMapper articleMapper;
-    @AuthCheck(mustRole = "admin")
+    @AuthCheck(anyRole ={"admin","user"})
     @GetMapping("/list")
     @ApiOperationSupport(author = "Karos")
-    @ApiOperation(value = "分页获取文章列表 - 管理员")
-    public BaseResponse<Page<ArticleVo>> listArticle(ArticleQueryRequest articleQueryRequest) {
+    @ApiOperation(value = "分页获取文章列表")
+    public BaseResponse<Page<ArticleVo>> listArticle(ArticleQueryRequest articleQueryRequest,HttpServletRequest request) {
         Page<ArticleVo> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize());
-        Page<ArticleVo> articleVoPage = articleMapper.VoPage(articlePage);
-        return ResultUtils.success(articleVoPage,"获取成功");
+        if (userService.isAdmin(request)) articlePage = articleMapper.VoPage(articlePage);
+        else articlePage=articleMapper.VoPagebyUser(String.valueOf(userService.getLoginUser(request).getId()),articlePage);
+        return ResultUtils.success(articlePage,"获取成功");
+    }
+
+    @GetMapping("/list/guest")
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "分页获取文章列表 - 前台")
+    public BaseResponse<Page<ArticleVo>> listArticlebyGuest(ArticleQueryRequest articleQueryRequest,HttpServletRequest request) {
+        Page<ArticleVo> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize());
+        articlePage = articleMapper.VoPageByGuest(articlePage);
+        return ResultUtils.success(articlePage,"获取成功");
     }
 
     @AuthCheck
@@ -431,19 +414,7 @@ public class ArticleController {
     @ApiOperation(value = "获取用户 点赞/收藏 文章")
     public BaseResponse<Page<ArticleVo>> listArticleByFavorite(HttpServletRequest request){
         User loginUser = userService.getLoginUser(request);
-
         Long id = loginUser.getId();
-        String userName = loginUser.getUserName();
-        String userAccount = loginUser.getUserAccount();
-        String userAvatar = loginUser.getUserAvatar();
-        Integer gender = loginUser.getGender();
-        String userRole = loginUser.getUserRole();
-        String userPassword = loginUser.getUserPassword();
-        Date createTime = loginUser.getCreateTime();
-        Date updateTime = loginUser.getUpdateTime();
-        String userMail = loginUser.getUserMail();
-        Integer isDelete = loginUser.getIsDelete();
-
         HashOperations hashOperations = redisTemplate.opsForHash();
         List<Articlethumbrecords> list = (List) hashOperations.get(RedisKeysConstant.ThumbsHistoryHash, id.toString());
         //如果缓存中有，那么从缓存里面取
@@ -479,6 +450,8 @@ public class ArticleController {
             });
         return ResultUtils.success(voList,"获取成功");
     }
+    @Resource
+    ArticleTypeService articleTypeService;
     /**
      * 分页获取列表
      *
@@ -486,7 +459,7 @@ public class ArticleController {
      * @param request
      * @return
      */
-    @AuthCheck
+//    @AuthCheck
     @GetMapping("/list/page")
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "分页获取文章列表")
@@ -512,13 +485,20 @@ public class ArticleController {
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
         queryWrapper.select(Article.class,info -> !"IP".equals(info.getColumn()));
         Long loginId = userService.getLoginUser(request).getId();
-        queryWrapper.like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle)
-                        .eq(StringUtils.isNotBlank(articleTitle),"isPublic",1)
-                                .or()
-                                     .like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle)
-                                        .eq(ObjectUtil.isEmpty(userId),"userId", loginId)
-                .eq(ObjectUtil.isNotEmpty(userId),"userId",userId)
-                                                .eq(StringUtils.isNotBlank(articleTitle),"isPublic",0);
+        if (!userService.isAdmin(request)){
+            queryWrapper.like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle)
+                    .eq(StringUtils.isNotBlank(articleTitle),"isPublic",1)
+                    .or()
+                    .like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle)
+                    .eq(ObjectUtil.isEmpty(userId),"userId", loginId)
+                    .eq(ObjectUtil.isNotEmpty(userId),"userId",userId)
+                    .eq(StringUtils.isNotBlank(articleTitle),"isPublic",0);
+        } else if (userService.isAdmin(request)==null) {
+            queryWrapper.like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle)
+                    .eq("isPublic",1);
+        } else{
+            queryWrapper.like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle);
+        }
         queryWrapper.orderBy(StringUtils.isNotBlank(sortField),
                 sortOrder.equals(CommonConstant.SORT_ORDER_DESC), sortField);
         Page<Article> articlePage = articleService.page(new Page<>(current, size), queryWrapper);
@@ -528,6 +508,9 @@ public class ArticleController {
         Page<ArticleVo> articleVoPage= (Page<ArticleVo>) articlePage.convert(u->{
             ArticleVo v=new ArticleVo();
             BeanUtils.copyProperties(u,v);
+            int type = u.getType();
+            v.setTypeId(type);
+            v.setType(articleTypeService.getById(type).getTypeName());
             Boolean thumb=false;
             if (ObjectUtil.isNotEmpty(list)){
                 Iterator<Articlethumbrecords> iterator = list.iterator();
@@ -582,13 +565,112 @@ public class ArticleController {
         return ResultUtils.success(ArticleHistoryVoPage,"获取成功");
     }
 
+    /**
+     * 删除
+     *
+     * @param deleteRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/delete")
+    @AllLimitCheck(mustText = "文章删除请求限制",limitMaxNUM = 10000)
+    @ApiOperationSupport(author = "Karos")
+    @ApiOperation(value = "删除文章接口")
+    public BaseResponse<Boolean> deleteArticle(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+        String obId = deleteRequest.getId();
+        List<String> obIds=deleteRequest.getIds();
+            if (deleteRequest == null || (StringUtils.isAnyBlank((String) obId)&&ObjectUtils.isEmpty(obIds))) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            }
+
+        if (ObjectUtils.isNotEmpty(obIds) && obIds.size()>0){
+            List<String> obIdList = (List<String>) obIds;
+            if (obIdList.size()<1){
+                throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择至少1条数据");
+            }
+            if ((obIdList).size()>20){
+                throw new BusinessException(ErrorCode.PARAMS_ERROR,"每次做多删除20条数据");
+            }
+            User user = userService.getLoginUser(request);
+            boolean b=true;
+            int errorNum=0;
+            // 判断是否存在
+            for (String id:obIdList){
+                Article byId = articleService.getById(id);
+                if (!byId.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
+                    b&=false;
+                    errorNum++;
+                    continue;
+                }
+                articleService.removeById(id);
+            }
+            if (b)return ResultUtils.success(b,obIdList.size()+"条数据全部删除成功");
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"有"+errorNum+"条数据删除失败，请检查个人权限或联系管理员...");
+        }
+        User user = userService.getLoginUser(request);
+        String id = (String) obId;
+        // 判断是否存在
+        Article oldArticle = articleService.getById(id);
+        if (oldArticle == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        // 仅本人或管理员可删除
+        if (!oldArticle.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        //逻辑上删除
+        boolean b = articleService.removeById(id);
+        if (b)return ResultUtils.success(b,"删除成功");
+        throw new BusinessException(ErrorCode.OPERATION_ERROR);
+    }
+
     @AuthCheck
+    @AllLimitCheck(mustText = "文章恢复请求限制",limitMaxNUM = 10000)
     @PostMapping("/recovery")
-    BaseResponse<Boolean> recovery(@RequestBody RecoveryRequest recoveryRequest){
+    BaseResponse<Boolean> recovery(@RequestBody RecoveryRequest recoveryRequest,HttpServletRequest request){
+        String obId = recoveryRequest.getId();
+        List<String> obIds=recoveryRequest.getIds();
+        if (recoveryRequest == null || (StringUtils.isAnyBlank((String) obId)&&ObjectUtils.isEmpty(obIds))) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        if (ObjectUtils.isNotEmpty(obIds) && obIds.size()>0){
+            List<String> obIdList = (List) obIds;
+            if (obIdList.size() < 1) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "请选择至少1条数据");
+            }
+            if ((obIdList).size() > 20) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "每次做多删除20条数据");
+            }
+            boolean b=true;
+            if (userService.isAdmin(request)){
+                b=articleMapper.recoveryByList(obIdList);
+            }
+            else{
+                User user=userService.getLoginUser(request);
+                int errorNum=0;
+                for (String id:obIdList){
+                    Article byId = articleService.getById(id);
+                    if (!byId.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
+                        b&=false;
+                        errorNum++;
+                        continue;
+                    }
+                    articleMapper.recoveryById(id);
+                }
+                if (b)return ResultUtils.success(b,obIdList.size()+"条数据全部恢复成功");
+                throw new BusinessException(ErrorCode.OPERATION_ERROR,"有"+errorNum+"条数据恢复失败，请检查个人权限或联系管理员...");
+            }
+            if (b)return ResultUtils.success(b,obIdList.size()+"条数据全部恢复成功");
+            throw new BusinessException(ErrorCode.OPERATION_ERROR);
+        }
         String id = (String) recoveryRequest.getId();
         Article article = articleMapper.ingoreGetOneByID(id);
         if (ObjectUtils.isEmpty(article)||article.getIsDelete()!=1){
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"请求数据不存在或没有被删除");
+        }
+        if(!userService.isAdmin(request)&& !Objects.equals(userService.getLoginUser(request).getId(), article.getUserId())){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean b = articleMapper.recoveryById(id);
         return ResultUtils.success(b,"恢复成功");

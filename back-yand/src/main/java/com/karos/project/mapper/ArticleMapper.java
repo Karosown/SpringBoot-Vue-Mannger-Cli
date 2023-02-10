@@ -34,6 +34,11 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     @Select("select " +
             "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
+            "from article left join articletype on article.type=articletype.id where isDelete = 0 and userId=#{userId}")
+    Page<ArticleVo> VoPagebyUser(@Param("userId") String userid,Page<ArticleVo> articleVoPage);
+
+    @Select("select " +
+            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
             "from article left join articletype on article.type=articletype.id where isDelete = 1")
     Page<ArticleVo> GarbageVoPage(Page<ArticleVo> articleVoPage);
 
@@ -41,6 +46,14 @@ public interface ArticleMapper extends BaseMapper<Article> {
     Article ingoreGetOneByID(@Param("id") String id);
     @Update("update article set isDelete=0 where id = #{id}")
     boolean recoveryById(@Param("id") String id);
+
+
+    boolean recoveryByList(@Param("ids") List<String> idList);
+
+    @Select("select " +
+            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
+            "from article left join articletype on article.type=articletype.id where isDelete = 0 and isPublic=1")
+    Page<ArticleVo> VoPageByGuest(Page<ArticleVo> articlePage);
 }
 
 

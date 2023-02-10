@@ -12,12 +12,14 @@ package com.karos.project.common;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class RecoveryRequest {
     /**
      * id
      */
-    private Object id;
-
+    private String id;
+    private List<String> ids;
     private static final long serialVersionUID = 1L;
 }

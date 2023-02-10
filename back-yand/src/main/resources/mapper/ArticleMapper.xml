@@ -31,4 +31,11 @@
           createTime,updateTime,isDelete,
           featImg,schedId
 	</sql>
+	<update id="recoveryByList" parameterType="java.util.List">
+		update article set isDelete=0 where id in(
+		<foreach collection="ids" item="item" index="index" separator=",">
+			#{item}
+		</foreach>)
+
+	</update>
 </mapper>

@@ -10,15 +10,14 @@
 
 package com.karos.project.aop;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.katool.iputils.IpUtils;
-import com.karos.project.common.ErrorCode;
-import com.karos.project.common.FileLimit;
-import com.karos.project.common.IPFileDownloadNum;
-import com.karos.project.common.ResultUtils;
+import com.karos.project.common.*;
 import com.karos.project.config.FinalvarConfig;
 import com.karos.project.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -43,7 +42,7 @@ import com.karos.project.annotation.AllLimitCheck;
 @Aspect
 @Component
 @Slf4j
-public class FileUploadIntercepotor {
+public class AllLimitIntercepotor {
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -52,6 +51,12 @@ public class FileUploadIntercepotor {
 
     @Around("@annotation(AllLimitCheck)")
     public Object doInterceptor(ProceedingJoinPoint point, AllLimitCheck AllLimitCheck) throws Throwable {
+        if ("-1".equals(AllLimitCheck.limitMaxNUM())){
+            AnnotationUtil.setValue(AllLimitCheck,"limitMaxNUM",fcf.MAX_FERQUENCY);
+        }
+        if ("-1".equals(AllLimitCheck.limitMaxExpTime())){
+            AnnotationUtil.setValue(AllLimitCheck,"limitMaxExpTime",fcf.EXP_TIME);
+        }
         // 计时
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -64,32 +69,33 @@ public class FileUploadIntercepotor {
         HashOperations hashOperations = redisTemplate.opsForHash();
         FileLimit fileLimit=null;
         //判断当前类型是否有
-        if (!hashOperations.hasKey("FileLimit",AllLimitCheck.mustText())) {
+        String type = AllLimitCheck.type().toString();
+        if (!hashOperations.hasKey(type,AllLimitCheck.mustText())) {
             ConcurrentHashMap<String, IPFileDownloadNum> ipFileDownloadNums = new ConcurrentHashMap<>();
-            ipFileDownloadNums.put(ip,new IPFileDownloadNum(1L,new Date(new Date().getTime()+fcf.MAX_FERQUENCY)));
+            ipFileDownloadNums.put(ip,new IPFileDownloadNum(1L,new Date(new Date().getTime()+AllLimitCheck.limitMaxNUM())));
             fileLimit=new FileLimit(AllLimitCheck.mustText(), ipFileDownloadNums);
-           hashOperations.put("FileLimit", AllLimitCheck.mustText(),fileLimit);
+           hashOperations.put(type, AllLimitCheck.mustText(),fileLimit);
         }
        else{
-            fileLimit = (FileLimit) hashOperations.get("FileLimit", AllLimitCheck.mustText());
+            fileLimit = (FileLimit) hashOperations.get(type, AllLimitCheck.mustText());
             ConcurrentHashMap<String, IPFileDownloadNum> ipFileDownloadNums = fileLimit.getIpFileDownloadNums();
                 IPFileDownloadNum ipFileDownloadNum = ipFileDownloadNums.get(ip);
                 if (ipFileDownloadNum!=null){
                     if (ipFileDownloadNum.getExpTime().getTime()>=new Date().getTime()){
-                        hashOperations.delete("FileLimit", AllLimitCheck.mustText());
+                        hashOperations.delete(type, AllLimitCheck.mustText());
                         ipFileDownloadNum.setFreQuency(0L);
-                        ipFileDownloadNum.setExpTime(new Date(new Date().getTime()+ fcf.EXP_TIME));
+                        ipFileDownloadNum.setExpTime(new Date(new Date().getTime()+ AllLimitCheck.limitMaxExpTime()));
                         ipFileDownloadNums.remove(ip);
                         ipFileDownloadNums.put(ip,ipFileDownloadNum.inc());
-                        hashOperations.put("FileLimit", AllLimitCheck.mustText(), fileLimit);
+                        hashOperations.put(type, AllLimitCheck.mustText(), fileLimit);
                     }else {
-                        if (ipFileDownloadNum.getFreQuency() >= fcf.MAX_FERQUENCY)
+                        if (ipFileDownloadNum.getFreQuency() >= AllLimitCheck.limitMaxNUM())
                             throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, AllLimitCheck.mustText()+"次数限制");
-                        hashOperations.delete("FileLimit",AllLimitCheck.mustText());
+                        hashOperations.delete(type,AllLimitCheck.mustText());
                         ipFileDownloadNums.remove(ip);
                         ipFileDownloadNums.put(ip,ipFileDownloadNum.inc());
                         hashOperations.put(
-                                "FileLimit", AllLimitCheck.mustText(),
+                                type, AllLimitCheck.mustText(),
                                 fileLimit
                         );
                     }

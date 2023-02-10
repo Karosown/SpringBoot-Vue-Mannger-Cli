@@ -258,10 +258,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @return
      */
     @Override
-    public boolean isAdmin(HttpServletRequest request) {
+    public Boolean isAdmin(HttpServletRequest request) {
         // 仅管理员可查询
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) userObj;
+        if (userObj==null)return null;
         return user != null && ADMIN_ROLE.equals(user.getUserRole());
     }
 

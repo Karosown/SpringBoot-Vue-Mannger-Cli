@@ -77,7 +77,7 @@ public class CommonController {
     @ApiOperation(value = "删除某些属性")
     @PostMapping("/delete")
     public BaseResponse<Boolean> delete(@RequestBody DeleteRequest deleteRequest){
-        boolean b = commonService.removeByIds( (List<String>)deleteRequest.getId());
+        boolean b = commonService.removeByIds( (List<String>)deleteRequest.getIds());
         return ResultUtils.success(b);
     }
 
