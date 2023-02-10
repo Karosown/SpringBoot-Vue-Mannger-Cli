@@ -52,7 +52,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 │  └─varConfig                  #一些简单的JSON对象
 │      └─userVarConfig
 ├─entity                 #实体类（建议以文件名命名类）
-│  ├─article                #文章实体类 增、查
+│  ├─article                #文章实体类 增、查、改
 │  ├─common                 #常用的实体类
 │  └─vo                  #视图层用实体类，一般情况下Query的可以直接使用，如果需要做些处理
 |						 #可以处理后使用Vo层传出
