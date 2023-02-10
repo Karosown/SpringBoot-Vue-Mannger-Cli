@@ -3,6 +3,7 @@
     <el-header>
       <el-col span="12">
         <el-button type="info" @click="downloadExcel">导出为excel</el-button>
+        <el-button type="success" @click="recoveryByList">批量恢复</el-button>
         <el-button type="info" @click="gotoArticleMangger">返回文章管理</el-button>
       </el-col>
       <el-col span="12">
@@ -15,6 +16,7 @@
     </el-header>
     <el-main>
       <el-table border lazy
+                ref="multipleTable"
           :data="articleDatas"
           style="width: 100%"
                 @selection-change="addCheck"
@@ -129,6 +131,36 @@ export default {
     }
   },
   methods:{
+    toggleSelection(rows) {
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+      }
+    },
+    recoveryByList(){
+      var recoveryRequestBody = new RecoveryRequestBody();
+      recoveryRequestBody.ids=this.reqBody.articleVoList.map(item=>{
+        return item.id;
+      });
+      this.axios.post(recoveryArticle,recoveryRequestBody)
+          .then(res=>{
+              if(!res.data.code){
+                for (const key in this.reqBody.articleVoList) {
+                  this.articleDatas.splice(this.articleDatas.indexOf(key),1)
+                }
+                this.toggleSelection()
+                  this.$message.success(res.data.message)
+              }
+              else this.$message.error(res.data.message)
+          })
+          .catch(err=>{
+             this.$message.info(err.data.message)
+          })
+
+    },
     gotoArticleMangger(){
       this.$router.push('/articlePage')
     },
