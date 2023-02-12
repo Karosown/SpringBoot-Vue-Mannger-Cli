@@ -68,7 +68,7 @@
           </template>
         </el-table-column>
         <el-table-column
-            property=""
+            property="userAccount"
             label="作者"
             sortable
             width="80">

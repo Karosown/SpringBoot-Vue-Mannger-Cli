@@ -394,7 +394,8 @@ public class ArticleController {
     @ApiOperation(value = "分页获取文章列表")
     public BaseResponse<Page<ArticleVo>> listArticle(ArticleQueryRequest articleQueryRequest,HttpServletRequest request) {
         Page<ArticleVo> articlePage=new Page<>(articleQueryRequest.getCurrent(),articleQueryRequest.getPageSize());
-        if (userService.isAdmin(request)) articlePage = articleMapper.VoPage(articlePage);
+        if (userService.isAdmin(request))
+            articlePage = articleMapper.VoPage(articlePage);
         else articlePage=articleMapper.VoPagebyUser(String.valueOf(userService.getLoginUser(request).getId()),articlePage);
         return ResultUtils.success(articlePage,"获取成功");
     }

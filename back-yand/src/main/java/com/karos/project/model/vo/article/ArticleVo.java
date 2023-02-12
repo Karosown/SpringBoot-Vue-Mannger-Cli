@@ -27,9 +27,10 @@ public class ArticleVo  extends BaseRowModel implements Serializable {
     /**
      * 所属用户ID
      */
-    @ExcelProperty(value = "用户ID",index = 1)
+    @ExcelProperty(value = "作者ID",index = 1)
     private Long userId;
-
+    @ExcelProperty(value = "作者账号",index = 1)
+    private String userAccount;
     /**
      * 用户文章ID
      */

@@ -22,24 +22,33 @@ public interface ArticleMapper extends BaseMapper<Article> {
 //            "From article left join articletype")
 //    List<ArticleVo> getVos();
 
-    @Select("select " +
-            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
-            "from article left join articletype on article.type=articletype.id where isDelete = 0")
+    @Select("select article.id as 'id',userId,user.userAccunt,userArticleid,articleTitle,articleUrl,articleIntroduction, " +
+            "articletype.typeName as 'type',article.type as 'typeId',labelList,isPublic,viewNum,thumbNum, " +
+            "article.createTime,article.updateTime,featImg,schedId " +
+            "from article left join articletype on article.type=articletype.id left join user on userId=user.id where article.isDelete = 0")
     List<ArticleVo> VoList();
 
-    @Select("select " +
-            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
-            "from article left join articletype on article.type=articletype.id where isDelete = 0")
+    @Select("select article.id as 'id',userId,user.userAccount,userArticleid,articleTitle,articleUrl,articleIntroduction," +
+            "articletype.typeName as 'type',article.type as 'typeId',labelList,isPublic,viewNum,thumbNum," +
+            "article.createTime,article.updateTime,featImg,schedId " +
+            "from article left join articletype on article.type=articletype.id left join user on article.userId=user.id " +
+            "where article.isDelete = 0")
     Page<ArticleVo> VoPage(Page<ArticleVo> articleVoPage);
 
     @Select("select " +
-            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
-            "from article left join articletype on article.type=articletype.id where isDelete = 0 and userId=#{userId}")
+            "article.id as 'id',userId,userAccount,userArticleid,articleTitle,articleUrl,articleIntroduction," +
+            "articletype.typeName as 'type',article.type as 'typeId',labelList,isPublic,viewNum,thumbNum," +
+            "article.createTime,article.updateTime,featImg,schedId " +
+            "from article left join articletype on article.type=articletype.id left join user on userId=user.id " +
+            "where article.isDelete = 0 and userId=#{userId}")
     Page<ArticleVo> VoPagebyUser(@Param("userId") String userid,Page<ArticleVo> articleVoPage);
 
     @Select("select " +
-            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
-            "from article left join articletype on article.type=articletype.id where isDelete = 1")
+            "article.id as 'id',userId,userAccount,userArticleid,articleTitle,articleUrl,articleIntroduction," +
+            "articletype.typeName as 'type',article.type as 'typeId',labelList,isPublic,viewNum,thumbNum," +
+            "article.createTime,article.updateTime,featImg,schedId " +
+            "from article left join articletype on article.type=articletype.id left join user on userId=user.id " +
+            "where article.isDelete = 1")
     Page<ArticleVo> GarbageVoPage(Page<ArticleVo> articleVoPage);
 
     @Select("select * from article where id=#{id}")
@@ -51,8 +60,8 @@ public interface ArticleMapper extends BaseMapper<Article> {
     boolean recoveryByList(@Param("ids") List<String> idList);
 
     @Select("select " +
-            "article.id,userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId\n" +
-            "from article left join articletype on article.type=articletype.id where isDelete = 0 and isPublic=1")
+            "article.id as 'id',userId,userArticleid,articleTitle,articleUrl,articleIntroduction,articletype.typeName as 'type',article.type as 'typeId',labelList,isPublic,viewNum,thumbNum,createTime,updateTime,featImg,schedId " +
+            "from article left join articletype on article.type=articletype.id left join user on article.userId=user.id where isDelete = 0 and isPublic=1")
     Page<ArticleVo> VoPageByGuest(Page<ArticleVo> articlePage);
 }
 
