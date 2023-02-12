@@ -51,10 +51,10 @@ public class AllLimitIntercepotor {
 
     @Around("@annotation(AllLimitCheck)")
     public Object doInterceptor(ProceedingJoinPoint point, AllLimitCheck AllLimitCheck) throws Throwable {
-        if ("-1".equals(AllLimitCheck.limitMaxNUM())){
+        if (AllLimitCheck.limitMaxNUM()==-1){
             AnnotationUtil.setValue(AllLimitCheck,"limitMaxNUM",fcf.MAX_FERQUENCY);
         }
-        if ("-1".equals(AllLimitCheck.limitMaxExpTime())){
+        if (AllLimitCheck.limitMaxExpTime()==-1){
             AnnotationUtil.setValue(AllLimitCheck,"limitMaxExpTime",fcf.EXP_TIME);
         }
         // 计时
@@ -89,8 +89,11 @@ public class AllLimitIntercepotor {
                         ipFileDownloadNums.put(ip,ipFileDownloadNum.inc());
                         hashOperations.put(type, AllLimitCheck.mustText(), fileLimit);
                     }else {
-                        if (ipFileDownloadNum.getFreQuency() >= AllLimitCheck.limitMaxNUM())
+                        if (ipFileDownloadNum.getFreQuency() >= AllLimitCheck.limitMaxNUM()){
+                            log.error("{}>={}",ipFileDownloadNum.getFreQuency() , AllLimitCheck.limitMaxNUM());
                             throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, AllLimitCheck.mustText()+"次数限制");
+                        }
+
                         hashOperations.delete(type,AllLimitCheck.mustText());
                         ipFileDownloadNums.remove(ip);
                         ipFileDownloadNums.put(ip,ipFileDownloadNum.inc());

@@ -6,12 +6,17 @@ import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.katool.util.expBase64Util;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.metadata.Sheet;
+import com.alibaba.excel.support.ExcelTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import cn.katool.io.ImageUtils;
 import com.karos.project.annotation.AllLimitCheck;
+import com.karos.project.annotation.AuthCheck;
 import com.karos.project.common.*;
 import com.karos.project.exception.BusinessException;
 import com.karos.project.model.dto.*;
@@ -20,25 +25,20 @@ import com.karos.project.model.entity.User;
 import com.karos.project.model.vo.UserVO;
 import com.karos.project.service.UserService;
 import cn.katool.qiniu.impl.QiniuServiceImpl;
-import com.qiniu.util.Json;
-import com.qiniu.util.StringMap;
+import com.qiniu.common.QiniuException;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -59,6 +59,25 @@ public class UserController {
     private QiniuServiceImpl qnsi;
     @Resource
     private RedisTemplate redisTemplate;
+    @AuthCheck(mustRole = "admin")
+    @PostMapping("/exportVoExcel")
+    public void exportExcel(@RequestBody UserExportRequest userExportRequest, HttpServletResponse response) throws IOException {
+        String fileName = String.valueOf(new Date().getTime());
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-disposition", "attachment;filename=" +fileName + ".xls");
+        ServletOutputStream out = response.getOutputStream();
+        ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLS,true);
+        Sheet sheet = new Sheet(1,0, UserVO.class);
+        //设置自适应宽度
+        sheet.setAutoWidth(Boolean.TRUE);
+        sheet.setSheetName(fileName);
+        writer.write(userExportRequest.getUserVoList(),sheet);
+        writer.finish();
+        out.flush();
+        response.getOutputStream().close();
+        out.close();
+    }
     // region 登录相关
 
     /**
@@ -219,16 +238,44 @@ public class UserController {
      * @param request
      * @return
      */
+    @AuthCheck(mustRole = "admin")
     @PostMapping("/add")
-    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request) {
-        if (userAddRequest == null) {
+    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request)  {
+        String userAccount = userAddRequest.getUserAccount();
+        if (userAddRequest == null||StringUtils.isAnyBlank(userAccount,userAddRequest.getUserPassword())) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (StringUtils.isNotEmpty(userAddRequest.getCheckPassword())){
+            if (!userAddRequest.getCheckPassword().equals(userAddRequest.getUserPassword())){
+                throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码验证失败，请检查两次输入的密码是否相同");
+            }
+        }
+        String userAvatar = userAddRequest.getUserAvatar();
+        if (StringUtils.isNotEmpty(userAvatar)){
+            if (expBase64Util.isBase64(userAvatar)){
+                try {
+                    //base64转file
+                    File tempFile = ImageUtils.base642img(userAvatar);
+                    String logo = qnsi.uploadFile(tempFile, "/userAvatar",DigestUtil.md5Hex(userAccount), ".png",true);
+                    userAddRequest.setUserAvatar(logo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
         User user = new User();
         BeanUtils.copyProperties(userAddRequest, user);
+        user.setUserPassword(userService.HexPassWord(userAddRequest.getUserPassword()));
         boolean result = userService.save(user);
         if (!result) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR);
+            try {
+                qnsi.delete("/userAvatar",DigestUtil.md5Hex(userAccount), ".png");
+            } catch (QiniuException e) {
+                throw new RuntimeException(e);
+            }
+            finally {
+                throw new BusinessException(ErrorCode.OPERATION_ERROR);
+            }
         }
         return ResultUtils.success(user.getId());
     }
@@ -242,6 +289,7 @@ public class UserController {
      */
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "删除用户")
+    @AuthCheck(mustRole = "admin")
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || Long.parseLong(deleteRequest.getId()) <= 0) {
@@ -250,6 +298,49 @@ public class UserController {
         boolean b = userService.removeById(Long.parseLong(deleteRequest.getId()));
         return ResultUtils.success(b);
     }
+
+    @AuthCheck(mustRole = "admin")
+    @PostMapping("/update/admin")
+    public BaseResponse<Long> updateUser(@RequestBody UserUpdateAdminRequest userAddRequest, HttpServletRequest request)  {
+        String userAccount = userAddRequest.getUserAccount();
+        if (userAddRequest == null||StringUtils.isAnyBlank(userAccount,userAddRequest.getUserPassword())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (StringUtils.isNotEmpty(userAddRequest.getCheckPassword())){
+            if (!userAddRequest.getCheckPassword().equals(userAddRequest.getUserPassword())){
+                throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码验证失败，请检查两次输入的密码是否相同");
+            }
+        }
+        String userAvatar = userAddRequest.getUserAvatar();
+        if (StringUtils.isNotEmpty(userAvatar)){
+            if (expBase64Util.isBase64(userAvatar)){
+                try {
+                    //base64转file
+                    File tempFile = ImageUtils.base642img(userAvatar);
+                    String logo = qnsi.uploadFile(tempFile, "/userAvatar",DigestUtil.md5Hex(userAccount), ".png",true);
+                    userAddRequest.setUserAvatar(logo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        User user = new User();
+        BeanUtils.copyProperties(userAddRequest, user);
+        user.setUserPassword(userService.HexPassWord(userAddRequest.getUserPassword()));
+        boolean result = userService.updateById(user);
+        if (!result) {
+            try {
+                qnsi.delete("/userAvatar",DigestUtil.md5Hex(userAccount), ".png");
+            } catch (QiniuException e) {
+                throw new RuntimeException(e);
+            }
+            finally {
+                throw new BusinessException(ErrorCode.OPERATION_ERROR);
+            }
+        }
+        return ResultUtils.success(user.getId());
+    }
+
 
     /**
      * 更新用户

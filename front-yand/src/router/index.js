@@ -6,11 +6,12 @@ import siteSettingPage from "@/view/manngger-main/siteSettingPage";
 import {globalValue} from "@/config/CommonConfig/globalconfig";
 import apiDoc from "@/view/manngger-main/apiDoc";
 import classPage from "@/view/manngger-main/classPage";
-import articlePage from "@/view/manngger-main/articlePage";
+import articlePage from "@/view/article-main/articlePage";
 import ariticlePublishPage from "@/view/article-main/ariticlePublishPage";
 import articleTypePage from "@/view/articletype-admin/articleTypePage";
 import articleUpdatePage from "@/view/article-main/articleUpdatePage";
-import articleGarbagePage from "@/view/manngger-main/articleGarbagePage";
+import articleGarbagePage from "@/view/article-main/articleGarbagePage";
+import userPage from "@/view/user-admin/userPage";
 //引入vue-router
 
 Vue.use(VueRouter)  //Vue全局使用Router
@@ -109,6 +110,14 @@ const router = new VueRouter({
                     component:articleGarbagePage,
                     meta:{
                         title:globalValue.protectTitle()+'文章回收站管理',
+                        mustLogin:true
+                    }
+                },
+                {
+                    path:'/userPage',
+                    component:userPage,
+                    meta:{
+                        title:globalValue.protectTitle()+'用户管理',
                         mustLogin:true
                     }
                 }

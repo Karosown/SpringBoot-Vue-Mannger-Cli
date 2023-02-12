@@ -44,7 +44,7 @@ public class FileupController {
     @Resource
     QiniuServiceImpl qiniuService;
     @PostMapping("/upload")
-    @AllLimitCheck(mustText = "文件上传")
+    @AllLimitCheck(mustText = "文件上传",limitMaxNUM = 1000,limitMaxExpTime = 5000)
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "文件上传")
     public BaseResponse fileUpload(@RequestParam("file")MultipartFile file){

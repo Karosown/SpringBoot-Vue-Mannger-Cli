@@ -10,8 +10,9 @@ import java.io.Serializable;
  * @author karos
  */
 @Data
-public class UserAddRequest implements Serializable {
+public class UserUpdateAdminRequest implements Serializable {
 
+    private long id;
     /**
      * 用户昵称
      */

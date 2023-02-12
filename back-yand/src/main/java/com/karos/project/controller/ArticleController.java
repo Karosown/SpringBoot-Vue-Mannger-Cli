@@ -96,7 +96,7 @@ public class ArticleController {
         }
         return ResultUtils.success(userAccount);
     }
-    @AuthCheck(mustRole = "admin")
+    @AuthCheck
     @PostMapping("/exportVoExcel")
     public void exportExcel(@RequestBody ArticleExportRequest articleExportRequest, HttpServletResponse response) throws IOException {
         String fileName = String.valueOf(new Date().getTime());
