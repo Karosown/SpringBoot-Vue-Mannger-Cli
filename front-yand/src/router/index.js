@@ -62,7 +62,8 @@ const router = new VueRouter({
                     component:apiDoc,
                     meta:{
                         title:globalValue.protectTitle()+'API文档',
-                        mustLogin:true
+                        mustLogin:true,
+                        mustAdmin:true
                     }
                 },
                 {
@@ -70,7 +71,8 @@ const router = new VueRouter({
                   component:classPage,
                   meta:{
                       title:globalValue.protectTitle()+'分类管理',
-                      mustLogin:true
+                      mustLogin:true,
+                      mustAdmin:true
                   }
                 },
                 {
@@ -102,7 +104,8 @@ const router = new VueRouter({
                     component:articleTypePage,
                     meta:{
                         title:globalValue.protectTitle()+'文章分类管理',
-                        mustLogin:true
+                        mustLogin:true,
+                        mustAdmin:true
                     }
                 },
                 {
@@ -118,7 +121,8 @@ const router = new VueRouter({
                     component:userPage,
                     meta:{
                         title:globalValue.protectTitle()+'用户管理',
-                        mustLogin:true
+                        mustLogin:true,
+                        mustAdmin:true
                     }
                 }
             ]

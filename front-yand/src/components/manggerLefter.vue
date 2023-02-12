@@ -13,7 +13,7 @@
         <i class="el-icon-chat-square"></i>
         <span slot="title">分类管理</span>
       </el-menu-item>
-      <el-menu-item index="/userPage" v-if="user.userRole='admin'">
+      <el-menu-item index="/userPage" v-if="user.userRole=='admin'">
         <i class="el-icon-user"></i>
         <span slot="title">用户管理</span>
       </el-menu-item>
@@ -21,7 +21,7 @@
         <i class="el-icon-setting"></i>
         <span slot="title">账号设置</span>
       </el-menu-item>
-      <el-menu-item index="/settingPage" v-if="user.userRole='admin'">
+      <el-menu-item index="/settingPage" v-if="user.userRole=='admin'">
         <i class="el-icon-set-up"></i>
         <span slot="title">站点设置</span>
       </el-menu-item>
@@ -29,7 +29,7 @@
         <i class="el-icon-user-solid"></i>
         <span slot="title">用户退出</span>
       </el-menu-item>
-      <el-menu-item index="/apidoc" v-if="user.userRole='admin'">
+      <el-menu-item index="/apidoc" v-if="user.userRole=='admin'">
         <i class="el-icon-set-up"></i>
         <span slot="title">前台对接API文档</span>
       </el-menu-item>
