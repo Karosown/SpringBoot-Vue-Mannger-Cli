@@ -2,9 +2,9 @@
   <el-container >
     <el-header>
       <el-col span="12">
-        <el-button type="info" @click="downloadExcel">导出为excel</el-button>
-        <el-button type="danger" @click="deleteByList">批量删除</el-button>
-        <el-button type="primary" @click="gotoGarbage">回收站</el-button>
+        <el-button type="info" icon="el-icon-download" @click="downloadExcel">导出为excel</el-button>
+        <el-button type="danger" icon="el-icon-delete-solid" @click="deleteByList">批量删除</el-button>
+        <el-button type="primary" icon="el-icon-delete" @click="gotoGarbage">回收站</el-button>
       </el-col>
       <el-col span="12">
         <el-col span="12" style="margin-right: 3px">

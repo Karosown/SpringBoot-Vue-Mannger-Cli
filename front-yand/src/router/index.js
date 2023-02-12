@@ -20,6 +20,7 @@ const router = new VueRouter({
     routes: [              //配置路由，这里是个数组
         {   //配置默认路由
             path:'/',
+            redirect:'/articlePage',
             component: manggerCenter,
             meta:{
                 title:globalValue.protectTitle()+globalValue.protectTitle,

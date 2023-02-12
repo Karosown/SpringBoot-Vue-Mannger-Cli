@@ -1,5 +1,5 @@
 <template>
-<div>
+<div style="text-align: center;">
 @{{Time}} PoweredBy {{SiteName}}
 </div>
 </template>

@@ -38,7 +38,7 @@ export default {
             if (!res.data.code){
               sessionStorage.setItem('loginStatus',JSON.stringify(res.data.data))
               this.$message.success("登录成功")
-              this.$router.push({path:'/manggerCenter'})
+              this.$router.push({path:'/'})
             }
             else{
               this.$message.error("登录失败！\n"+res.data.message)

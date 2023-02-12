@@ -20,6 +20,7 @@ import cn.katool.util.expDateUtil;
 import cn.katool.iputils.IpUtils;
 import cn.katool.lock.LockUtil;
 import cn.katool.qiniu.impl.QiniuServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
@@ -81,6 +82,7 @@ public class ArticleTypeController {
         return ResultUtils.success(articleTypeService.allList());
     }
 
+    @AuthCheck(mustRole = "admin")
     @PostMapping("/add")
     public BaseResponse<Boolean> addType(@RequestBody ArticleTypeAddRequestBody articleTypeAddRequestBody){
         if (ObjectUtils.isEmpty(articleTypeAddRequestBody)){
@@ -95,6 +97,21 @@ public class ArticleTypeController {
         BeanUtils.copyProperties(articleTypeAddRequestBody,articleType);
         boolean save = articleTypeService.save(articleType);
         return ResultUtils.success(save);
+    }
+
+    @AuthCheck(mustRole = "admin")
+    @PostMapping("/delete")
+    public BaseResponse<Boolean> delete(@RequestBody DeleteRequest deleteRequest){
+        String id = deleteRequest.getId();
+        LambdaQueryWrapper<ArticleType> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(id!=null,ArticleType::getId,id)
+                .or()
+                        .eq(id!=null,ArticleType::getFid,id);
+        boolean remove = articleTypeService.remove(queryWrapper);
+        if (!remove){
+            throw new BusinessException(ErrorCode.OPERATION_ERROR);
+        }
+        return ResultUtils.success(remove);
     }
     // endregion
 
