@@ -66,7 +66,7 @@ export default {
       typelist:null,
       filterText:null,
       articleTypeAddRequestBody:new ArticleTypeAddRequestBody(),
-      userRole:sessionStorage.getItem('loginStatus').userRole
+      userRole:JSON.parse(sessionStorage.getItem('loginStatus')).userRole
     }
   },
   methods:{

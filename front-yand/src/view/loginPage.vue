@@ -33,6 +33,7 @@ export default {
   },
   methods:{
     onSubmit(){
+      // get post update
       this.axios.post(sysLogin,loginForm)
           .then(res=>{
             if (!res.data.code){
