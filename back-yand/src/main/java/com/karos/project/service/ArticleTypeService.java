@@ -13,4 +13,6 @@ import java.util.List;
 */
 public interface ArticleTypeService extends IService<ArticleType> {
     public List<ArticleTypeVo> allList();
+
+    public Integer getMaxId();
 }

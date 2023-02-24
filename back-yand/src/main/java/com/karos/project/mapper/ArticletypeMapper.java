@@ -2,6 +2,7 @@ package com.karos.project.mapper;
 
 import com.karos.project.model.entity.ArticleType;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
 * @author 30398
@@ -11,6 +12,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface ArticletypeMapper extends BaseMapper<ArticleType> {
 
+    @Select("select max(id) from articletype")
+    public Integer getMaxId();
 }
 
 

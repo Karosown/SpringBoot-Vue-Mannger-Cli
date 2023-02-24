@@ -88,9 +88,9 @@ public class ArticleTypeController {
         if (ObjectUtils.isEmpty(articleTypeAddRequestBody)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        if (ObjectUtils.isNotEmpty(articleTypeAddRequestBody.getFId())
-                &&ObjectUtils.isEmpty(articleTypeService.getById(articleTypeAddRequestBody.getFId()))
-                &&articleTypeAddRequestBody.getFId()!=0){
+        if (ObjectUtils.isNotEmpty(articleTypeAddRequestBody.getFid())
+                &&ObjectUtils.isEmpty(articleTypeService.getById(articleTypeAddRequestBody.getFid()))
+                &&articleTypeAddRequestBody.getFid()!=0){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         ArticleType articleType=new ArticleType();
@@ -98,16 +98,52 @@ public class ArticleTypeController {
         boolean save = articleTypeService.save(articleType);
         return ResultUtils.success(save);
     }
+    private Integer[] typeIds=null;
 
+    private Integer find(int x){
+        if (typeIds[x]==x)return x;
+        return typeIds[x]=find(typeIds[x]);
+    }
+    private Boolean merge(int x,int y){
+        int _x=find(x);
+        int _y=find(y);
+        if (_x==_y)return true;
+        typeIds[_y]=_x;
+        return true;
+    }
+
+    private Boolean isChild(int f,int c){
+        int _c=find(c);
+        return f==_c;
+    }
     @AuthCheck(mustRole = "admin")
     @PostMapping("/delete")
     public BaseResponse<Boolean> delete(@RequestBody DeleteRequest deleteRequest){
         String id = deleteRequest.getId();
-        LambdaQueryWrapper<ArticleType> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(id!=null,ArticleType::getId,id)
-                .or()
-                        .eq(id!=null,ArticleType::getFid,id);
-        boolean remove = articleTypeService.remove(queryWrapper);
+        //无法解决子子分类的问题
+//        LambdaQueryWrapper<ArticleType> queryWrapper=new LambdaQueryWrapper<>();
+//
+//        queryWrapper.eq(id!=null,ArticleType::getId,id)
+//                .or()
+//                        .eq(id!=null,ArticleType::getFid,id);
+//        boolean remove = articleTypeService.remove(queryWrapper);
+        List<ArticleType> list = articleTypeService.list();
+        typeIds=new Integer[articleTypeService.getMaxId()+10];
+        for (int i=0;i<typeIds.length;i++) typeIds[i]=i;
+        Integer idInteger = Integer.parseInt(id);
+        for(ArticleType type:list){
+            if (type.getId()== idInteger){
+                continue;
+            }
+            merge(type.getFid(),type.getId());
+        }
+        List<ArticleType> dlist=new ArrayList<>();
+        for(ArticleType type:list){
+            if (typeIds[type.getId()]== idInteger ||isChild(idInteger,type.getId())){
+                dlist.add(type);
+            }
+        }
+        boolean remove = articleTypeService.removeByIds(dlist);
         if (!remove){
             throw new BusinessException(ErrorCode.OPERATION_ERROR);
         }

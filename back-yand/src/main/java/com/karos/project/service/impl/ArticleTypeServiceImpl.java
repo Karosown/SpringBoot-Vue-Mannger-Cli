@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -62,6 +63,12 @@ public class ArticleTypeServiceImpl extends ServiceImpl<ArticletypeMapper, Artic
             }).collect(Collectors.toSet()).stream().collect(Collectors.toList());
             list.remove(null);
             return list;
+    }
+    @Resource
+    ArticletypeMapper articletypeMapper;
+    @Override
+    public Integer getMaxId() {
+        return articletypeMapper.getMaxId();
     }
 }
 

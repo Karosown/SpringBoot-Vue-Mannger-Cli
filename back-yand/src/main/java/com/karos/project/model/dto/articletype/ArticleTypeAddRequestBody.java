@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ArticleTypeAddRequestBody {
     private Integer id;
-    private Integer fId;
+    private Integer fid;
     private String typeName;
     private static final long serialVersionUID = 1L;
 }
