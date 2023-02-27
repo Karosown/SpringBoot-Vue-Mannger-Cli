@@ -159,23 +159,23 @@ export default {
       const isJPG = (file.type === 'image/jpeg') || (file.type === 'image/png') || (file.type === 'image/bmp');
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isJPG) {
-        this.$message.error('上传头像只能是 jpg、png、bmp 格式!');
+        this.$message.error('上传文件只能是 jpg、png、bmp 格式!');
       }
       if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!');
+        this.$message.error('上传文件图片大小不能超过 2MB!');
       }
       // this.$refs.upload.submit();
       return isJPG && isLt2M;
     },
   },
   mounted() {
-    this.publishTime=this.$parent.$parent.$parent.$parent.articleVo.publishTime
     this.axios.get(getTypelist)
         .then(res => {
           if (!res.data.code) {
             this.types = res.data.data
           }
         })
+    this.publishTime=this.$parent.$parent.$parent.$parent.articleVo.publishTime||null
   },
   watch:{
     type(){

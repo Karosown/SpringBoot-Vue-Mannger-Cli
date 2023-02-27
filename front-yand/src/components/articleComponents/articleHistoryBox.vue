@@ -27,16 +27,6 @@ export default {
     ArticleId:null
   },
   data(){
-    /**
-     * {
-     * 				"id": "",
-     * 				"ip": "",
-     * 				"ArticleUrl": "",
-     * 				"updateTime": "",
-     * 				"userId": 0,
-     * 				"version": 0
-     * 			}
-     */
     return{
       updatelist:[],
     }

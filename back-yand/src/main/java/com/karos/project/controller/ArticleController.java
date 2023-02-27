@@ -375,8 +375,10 @@ public class ArticleController {
         Article article = articleService.getById(id);
         ArticleVo articleVo = new ArticleVo();
         BeanUtils.copyProperties(article, articleVo);
-        Date publishTime = (Date) redisTemplate.opsForHash().get(RedisKeysConstant.SchedDate, articleVo.getSchedId());
-        articleVo.setPublishTime(publishTime);
+        if(article.getIsPublic()==0){
+            Date publishTime = (Date) redisTemplate.opsForHash().get(RedisKeysConstant.SchedDate, articleVo.getSchedId());
+            articleVo.setPublishTime(publishTime);
+        }
         return ResultUtils.success(articleVo,"获取成功");
     }
 
@@ -465,7 +467,7 @@ public class ArticleController {
     @ApiOperationSupport(author = "Karos")
     @ApiOperation(value = "分页获取文章列表")
     public BaseResponse<Page<ArticleVo>> listArticleByPage(ArticleQueryRequest articleQueryRequest, HttpServletRequest request) {
-        if (articleQueryRequest == null||(ObjectUtil.isNull(articleQueryRequest.getUserId())&&StringUtils.isAnyBlank(articleQueryRequest.getArticleTitle()))) {
+        if (articleQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         Article articleQuery = new Article();
@@ -485,8 +487,8 @@ public class ArticleController {
         //ToDo: 直接查询数据库效率低 后期改进为ElasticSearch
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
         queryWrapper.select(Article.class,info -> !"IP".equals(info.getColumn()));
-        Long loginId = userService.getLoginUser(request).getId();
-        if (!userService.isAdmin(request)){
+        Long loginId = userService.getLoginUserNoThrow(request).getId();
+        if (userService.isAdmin(request)!=null&& userService.isAdmin(request)){
             queryWrapper.like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle)
                     .eq(StringUtils.isNotBlank(articleTitle),"isPublic",1)
                     .or()
@@ -498,10 +500,20 @@ public class ArticleController {
             queryWrapper.like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle)
                     .eq("isPublic",1);
         } else{
-            queryWrapper.like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle);
+            queryWrapper.like(StringUtils.isNotBlank(articleTitle),"articleTitle",articleTitle)
+            .eq("isPublic",1);
         }
         queryWrapper.orderBy(StringUtils.isNotBlank(sortField),
                 sortOrder.equals(CommonConstant.SORT_ORDER_DESC), sortField);
+        if (articleQueryRequest.getType()!=0){
+              queryWrapper.eq("type",articleQueryRequest.getType());
+        }
+        if (StringUtils.isNotEmpty(articleQueryRequest.getTypeName())){
+            QueryWrapper<ArticleType> typeWrapper = new QueryWrapper<>();
+            typeWrapper.eq("typeName",articleQueryRequest.getTypeName());
+
+            queryWrapper.eq("type",articleTypeService.getOne(typeWrapper));
+        }
         Page<Article> articlePage = articleService.page(new Page<>(current, size), queryWrapper);
         HashOperations hashOperations = redisTemplate.opsForHash();
         //从缓存里面读取
@@ -510,8 +522,13 @@ public class ArticleController {
             ArticleVo v=new ArticleVo();
             BeanUtils.copyProperties(u,v);
             int type = u.getType();
-            v.setTypeId(type);
-            v.setType(articleTypeService.getById(type).getTypeName());
+            if (articleTypeService.getById(type)!=null){
+                v.setTypeId(type);
+                v.setType(articleTypeService.getById(type).getTypeName());
+            }
+            else{
+                v.setType("未分类");
+            }
             Boolean thumb=false;
             if (ObjectUtil.isNotEmpty(list)){
                 Iterator<Articlethumbrecords> iterator = list.iterator();

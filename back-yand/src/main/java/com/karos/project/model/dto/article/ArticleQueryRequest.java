@@ -35,5 +35,9 @@ public class ArticleQueryRequest extends PageRequest implements Serializable {
      * 类型
      */
     private int type;
+    private String typeName;
+    /**
+     * 类型名
+     */
     private static final long serialVersionUID = 1L;
 }

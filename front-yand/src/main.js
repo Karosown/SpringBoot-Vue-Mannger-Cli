@@ -4,45 +4,45 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.config.silent = true
 Vue.use(ElementUI)
-// 引入axios
-import axios from 'axios'
-import { baseAPI, sysGetlogin } from '@/config/ApiConfig/apiconfig'
-import router from '@/router'
-import { globalValue } from '@/config/CommonConfig/globalconfig'
-// import { sysLogout } from '@/config/ApiConfig/apiconfig';
-// 挂载到vue原型链上
-axios.defaults.baseURL = baseAPI
-axios.defaults.crossDomain = true
-axios.defaults.withCredentials = true //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
-Vue.prototype.axios = axios
-Vue.config.productionTip = false
+  // 引入axios
+  import axios from 'axios'
+  import { baseAPI, sysGetlogin } from '@/config/ApiConfig/apiconfig'
+  import router from '@/router'
+  import { globalValue } from '@/config/CommonConfig/globalconfig'
+  // import { sysLogout } from '@/config/ApiConfig/apiconfig';
+  // 挂载到vue原型链上
+  axios.defaults.baseURL = baseAPI
+  axios.defaults.crossDomain = true
+  axios.defaults.withCredentials = true //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
+  Vue.prototype.axios = axios
+  Vue.config.productionTip = false
 
-// 对于一些需要监视的sessionStorage的变量可任意选择使用resetSetItem函数，当然，也要用监视器
-/**
- *      window.addEventListener('setItem',()=>{
- *         this.list=JSON.parse(sessionStorage.getItem('notelist'))
- *         this.isSearchOrFavorite=JSON.parse(sessionStorage.getItem('isSearchOrFavorite'))
- *       })
- */
-Vue.prototype.resetSetItem = function (key, newVal) {
-  switch (key) {
-    case 'articlelist':
-    case 'updateText':
-      var newStorageEvent = document.createEvent('StorageEvent');
-      var storage = {
-        setItem: function (k, val) {
-          sessionStorage.setItem(k, val);
-          // 初始化创建的事件
-          newStorageEvent.initStorageEvent('setItem', false, false, k, null, val, null, null);
-          // 派发对象
-          window.dispatchEvent(newStorageEvent)
+  // 对于一些需要监视的sessionStorage的变量可任意选择使用resetSetItem函数，当然，也要用监视器
+  /**
+   *      window.addEventListener('setItem',()=>{
+   *         this.list=JSON.parse(sessionStorage.getItem('notelist'))
+   *         this.isSearchOrFavorite=JSON.parse(sessionStorage.getItem('isSearchOrFavorite'))
+   *       })
+   */
+  Vue.prototype.resetSetItem = function (key, newVal) {
+    switch (key) {
+      case 'articlelist':
+      case 'updateText':
+        var newStorageEvent = document.createEvent('StorageEvent');
+        var storage = {
+          setItem: function (k, val) {
+            sessionStorage.setItem(k, val);
+            // 初始化创建的事件
+            newStorageEvent.initStorageEvent('setItem', false, false, k, null, val, null, null);
+            // 派发对象
+            window.dispatchEvent(newStorageEvent)
+          }
         }
-      }
-      return storage.setItem(key, newVal);
-    default:
-      break
+        return storage.setItem(key, newVal);
+      default:
+        break
+    }
   }
-}
 
 // 进入页面前校验
 router.beforeEach((to, from, next) => {

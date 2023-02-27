@@ -60,6 +60,7 @@ public interface UserService extends IService<User> {
      * @return
      */
     User getLoginUser(HttpServletRequest request);
+    User getLoginUserNoThrow(HttpServletRequest request);
 
     /**
      * 是否为管理员

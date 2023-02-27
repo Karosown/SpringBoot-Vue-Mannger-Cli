@@ -36,7 +36,7 @@ export default {
   components: {ArticleHistoryBox, EditorBox, ArticleAsideBox},
   data() {
     return {
-      articleUpdateRequest: new ArticleUpdateRequest,
+      articleUpdateRequest: new ArticleUpdateRequest(),
       articleVo:this.$route.params.articleVo,
       openHistory:false
     }
@@ -74,7 +74,15 @@ export default {
          this.articleUpdateRequest.articleIntroduction = this.articleVo.articleIntroduction
          this.articleUpdateRequest.featImg = this.articleVo.featImg
          this.articleUpdateRequest.schedId = this.articleVo.scoped
-         this.articleUpdateRequest.publishTime
+         this.articleUpdateRequest.publishTime  = this.articleVo.publishTime
+         var xhr = new XMLHttpRequest();
+         xhr.open('GET', this.articleVo.articleUrl,true);
+         xhr.send(null);
+         xhr.onreadystatechange= ()=>{
+           setTimeout(()=>{
+             this.resetSetItem('updateText',xhr.responseText)
+           },500)
+         }
        })
    window.addEventListener('setItem', () => {
      this.articleUpdateRequest.articleText = sessionStorage.getItem('updateText')

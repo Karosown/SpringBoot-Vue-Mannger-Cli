@@ -251,6 +251,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return currentUser;
     }
 
+    @Override
+    public User getLoginUserNoThrow(HttpServletRequest request) {
+        // 先判断是否已登录
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null || currentUser.getId() == null) {
+            log.warn("未登录");
+            return new User(-1L,null,null,null,null,null,null,null,null,null,null);
+        }
+        //解释一下为什么要从数据库拿，为了保证每次拿到的都是最新数据
+        long userId = currentUser.getId();
+        HashOperations hashOperations = redisTemplate.opsForHash();
+        String UID = Long.valueOf(userId).toString();
+        if (hashOperations.hasKey("LoginUser", UID)) {
+            currentUser= (User) hashOperations.get("LoginUser",     UID);
+        }
+        else {
+            currentUser = this.getById(userId);
+            if (currentUser!=null) {
+                hashOperations.put("LoginUser", UID,currentUser);
+                redisTemplate.expire("LoginUser",1, TimeUnit.HOURS);
+            }
+
+        }
+        if (currentUser == null) {
+            log.warn("未登录");
+            return new User(-1L,null,null,null,null,null,null,null,null,null,null);
+        }
+        request.getSession().setAttribute(USER_LOGIN_STATE,currentUser);
+        return currentUser;
+    }
+
     /**
      * 是否为管理员
      *l
