@@ -555,6 +555,7 @@ public class ArticleController {
         Page<ArticleVo> articleVoPage = articleMapper.GarbageVoPage(articlePage);
         return ResultUtils.success(articleVoPage,"获取成功");
     }
+    
     @AuthCheck
     @GetMapping("/getHistory")
     public BaseResponse<Page<ArticleHistoryVo>> getUpdateHistory(ArticleHistoryQueryRequest ArticleHistoryQueryRequest, HttpServletRequest request){
