@@ -33,9 +33,10 @@ export default {
   },
   methods:{
     onSubmit(){
+
       // get post update
       this.axios.post(sysLogin,loginForm)
-          .then(res=>{
+          .then(res=>{  //lambda
             if (!res.data.code){
               sessionStorage.setItem('loginStatus',JSON.stringify(res.data.data))
               this.$message.success("登录成功")
@@ -50,7 +51,17 @@ export default {
           })
     },
     reg(){
+    this.axios.get()
+        .then(res=>{
+            if(!res.data.code){
 
+                this.$message.success(res.data.message)
+            }
+            else this.$message.error(res.data.message)
+        })
+        .catch(err=>{
+           this.$message.info(err.data.message)
+        })
     }
   }
 }

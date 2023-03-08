@@ -512,7 +512,8 @@ public class ArticleController {
             QueryWrapper<ArticleType> typeWrapper = new QueryWrapper<>();
             typeWrapper.eq("typeName",articleQueryRequest.getTypeName());
 
-            queryWrapper.eq("type",articleTypeService.getOne(typeWrapper));
+            Integer id = articleTypeService.getOne(typeWrapper).getId();
+            queryWrapper.eq("type", id);
         }
         Page<Article> articlePage = articleService.page(new Page<>(current, size), queryWrapper);
         HashOperations hashOperations = redisTemplate.opsForHash();
