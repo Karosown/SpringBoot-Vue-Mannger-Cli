@@ -84,6 +84,13 @@ export default {
                   if(!res.data.code){
 
                     this.$message.success(res.data.message)
+
+                    this.axios.get(getTypelist)
+                        .then(res=>{
+                          if (!res.data.code){
+                            this.typelist=res.data.data
+                          }
+                        })
                   }
                   else this.$message.error(res.data.message)
                 })
@@ -100,8 +107,13 @@ export default {
       this.axios.post(addType,this.articleTypeAddRequestBody)
           .then(res=>{
               if(!res.data.code){
-
-                  this.$message.success(res.data.message)
+                this.$message.success(res.data.message)
+                this.axios.get(getTypelist)
+                    .then(res=>{
+                      if (!res.data.code){
+                        this.typelist=res.data.data
+                      }
+                    })
               }
               else this.$message.error(res.data.message)
           })

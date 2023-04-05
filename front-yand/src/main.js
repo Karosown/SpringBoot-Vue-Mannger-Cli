@@ -46,20 +46,6 @@ Vue.use(ElementUI)
 
 // 进入页面前校验
 router.beforeEach((to, from, next) => {
-  // if (to.path == '/loginpage') {
-  //   axios.post(sysLogout)
-  //         .then(res=>{
-  //          if(!res.data.code){
-  //         this.$message.success(res.data.message);
-  //            sessionStorage.removeItem('loginStatus')
-  //         //  this.$router.push({path:'/login'});
-  //         next('/login');
-  //           }
-  //        })
-  //       }
-  // } else {
-  //   next()
-  // }
   if (to.meta.title) document.title = to.meta.title
   else document.title = globalValue.protectTitle()
   if (to.path == '/login') {

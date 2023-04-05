@@ -1,8 +1,7 @@
 <template>
   <div id="login" >
     <el-form v-model="loginForm"  label-width="80px" class="login-box">
-
-      <h3 class="login-title">欢迎登录</h3>
+        <h3 class="login-title">欢迎登录</h3>
       <el-form-item  label="账号" prop="username">
         <el-input type="text" v-model="loginForm.userAccount" placeholder="请输入账号"/>
       </el-form-item>
