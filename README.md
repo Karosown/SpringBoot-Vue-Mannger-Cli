@@ -17,7 +17,7 @@
 
 ### 源码地址：
 
-KaTool: <a href="http://www.github.com/Karosown/KaTool">http://www.github.com/Karosown/KaTool</a>
+外部技术：KaTool: <a href="http://www.github.com/Karosown/KaTool">http://www.github.com/Karosown/KaTool</a>
 
 
 ### 目前实现功能：
