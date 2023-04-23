@@ -17,6 +17,10 @@
         <i class="el-icon-chat-square"></i>
         <span slot="title">分类管理</span>
       </el-menu-item>
+      <el-menu-item index="/yuyuePage">
+        <i class="el-icon-notebook-1"></i>
+        <span slot="title">预约记录</span>
+      </el-menu-item>
 <!--      <el-menu-item index="/userSetting">-->
 <!--        <i class="el-icon-setting"></i>-->
 <!--        <span slot="title">账号设置</span>-->

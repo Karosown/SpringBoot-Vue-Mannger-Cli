@@ -542,8 +542,8 @@ public class ArticleController {
                 }
             }
             v.setHasThumb(thumb);
-            if (hashOperations.hasKey(RedisKeysConstant.ThumbsNum,v.getId()))
-                v.setThumbNum(Long.valueOf((Integer)hashOperations.get(RedisKeysConstant.ThumbsNum,v.getId())));
+//            if (hashOperations.hasKey(RedisKeysConstant.ThumbsNum,v.getId()))
+//                v.setThumbNum(Long.valueOf((Integer)hashOperations.get(RedisKeysConstant.ThumbsNum,v.getId())));
             return v;
         });
         return ResultUtils.success(articleVoPage,"获取成功");

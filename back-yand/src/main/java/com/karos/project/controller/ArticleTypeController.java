@@ -65,12 +65,6 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/article/type")
 @Slf4j
 public class ArticleTypeController {
-    @Resource
-    QiniuServiceImpl qnsi;
-    @Resource
-    RedisTemplate redisTemplate;
-    @Resource
-    private UserService userService;
 
     @Resource
     private ArticleTypeService articleTypeService;

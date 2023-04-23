@@ -12,6 +12,7 @@ import articleTypePage from "@/view/articletype-admin/articleTypePage";
 import articleUpdatePage from "@/view/article-main/articleUpdatePage";
 import articleGarbagePage from "@/view/article-main/articleGarbagePage";
 import userPage from "@/view/user-admin/userPage";
+import yuyuePage from "@/view/yuyue-main/yuyuePage";
 //引入vue-router
 
 Vue.use(VueRouter)  //Vue全局使用Router
@@ -55,6 +56,14 @@ const router = new VueRouter({
                     component:siteSettingPage,
                     meta:{
                         title:globalValue.protectTitle()+'站点设置',
+                        mustLogin:true
+                    }
+                },
+                {
+                    path:'/yuyuePage',
+                    component:yuyuePage,
+                    meta:{
+                        title:globalValue.protectTitle()+'预约管理',
                         mustLogin:true
                     }
                 },
